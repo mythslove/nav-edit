@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="266" height="184" title="创建地图">
+	<mx:Script>
+		<![CDATA[
+			import util.PicIncise;
+			
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+			import mx.utils.StringUtil;
+			 private var cut:PicIncise;
+		     private var imagesFilter:FileFilter = new FileFilter("jpg,bmp, gif, png", "*.jpg;*.bmp;*.gif;*.png");
+		     private var url:String;
+			 private function showDialog():void
+	 		 {
+	 			var file:File = File.documentsDirectory;
+	 			file.browseForOpenMultiple("选择背景图片",[imagesFilter]);
+	 			file.addEventListener(FileListEvent.SELECT_MULTIPLE,selectPic);
+	 		}
+	 		private function selectPic(event:FileListEvent):void 
+			{
+				var fa:Array = event.files;
+			    for each (var file:File in fa)
+			    {			    	
+			        url = file.url;
+			        picUrl.text = url;
+			    }     
+			}
+			private function close():void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			private function createMap():void
+			{
+				cut = new PicIncise();
+				var _size:Array = getPicSize(picSize.text);
+			    cut.cutPic(url,_size[0],_size[1],"map/"+this.sceneId.text,this.sceneId.text);
+			    cut.addEventListener("success",loadSuccess);
+			}
+			private function loadSuccess(e:Event):void
+			{
+				var arr:Array = getPicSize(picSize.text);
+				close();
+				var file:File = File.documentsDirectory.resolvePath("map/"+this.sceneId.text + "/" + this.sceneId.text + ".mapedit");
+				//trace(file.url)
+				Application.application.onFileSelect(file);
+			}
+			private function getPicSize(str:String):Array
+			{
+				var _size:String = StringUtil.trim(str);
+			    var arr:Array = _size.split(',');
+				return arr;
+			}
+		]]>
+	</mx:Script>
+	<mx:Button x="40" y="106" label="创建" click="createMap()"/>
+	<mx:Button x="130" y="106" label="取消"  click="close()"/>
+	<mx:Label x="21" y="15" text="场景名:"/>
+	<mx:TextInput id="sceneId" x="69" y="15" width="135" text="OOXX"/>
+	<mx:Label x="22" y="43" text="背景图:"/>
+	<mx:TextInput id="picUrl" x="68" y="42" width="74"/>
+	<mx:Button x="150" y="40" label="浏览" width="53" click="showDialog()"/>
+	<mx:Label  x="13" y="73" text="切割大小:"/>
+	<mx:TextInput id="picSize" x="68" y="73" width="63" text="300,300"/>
+	<mx:Label x="137" y="74" fontSize="11" color="0xdd0000" text="(默认宽300,高300)"/>
+</mx:TitleWindow>
