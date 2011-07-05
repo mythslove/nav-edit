@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" title="导入向导"  showCloseButton="true"
+	 width="290" height="208" close="_close()">
+<mx:Script>
+	<![CDATA[
+		import mx.managers.PopUpManager;
+		import mx.events.ListEvent;
+		import com.util.SystemFile;
+		import mx.collections.ArrayCollection;
+		   [Bindable]
+	       private var arr:ArrayCollection = new ArrayCollection;
+		   public var file:SystemFile;
+		   private var temp:String;
+		   private function _close():void
+		   {
+		   	 PopUpManager.removePopUp(this);
+		   }
+		   public function init():void
+		   {
+		   	  v1.selectedIndex = 0;  
+		   	  arr.removeAll();
+		   	  temp = "";
+		   }
+		   private function next():void
+		   {
+		   	  v1.selectedIndex = 1;
+		   	  
+		   }
+		   private function input():void
+		   {
+		   	  if(symbolName.text=="")
+		   	  return ;
+		      var str:String = symbolName.text;
+		   	  for(var i:int=0;i<arr.length;i++)
+		   	  {
+		   	  	if(arr[i]==str)
+		   	  	{
+		   	  		return ;
+		   	  	}
+		   	  }
+		   	  arr.addItem(str);
+		   	  symbolName.text = "";
+		   }
+		   private function loadFile():void
+		   {
+		   	  if(!check.selected)
+		   	  {
+			      if(arr.length>0)
+			   	   file.leadInFile(arr.source);
+			  }
+			  else
+			  {
+			  	 file.leadInFile();
+			  }
+		   	   
+		   	   _close();
+		   }
+		   private function listClick(e:ListEvent):void
+		   {
+		   	  temp = String(e.itemRenderer.data);
+		   }
+		   private function remove():void
+		   {
+		   	  if(!temp)
+		   	  return ;
+		   	  for(var i:int=0;i<arr.length;i++)
+		   	  {
+		   	  	if(arr[i]==temp)
+		   	  	{
+		   	  		arr.removeItemAt(i);
+		   	  	    break;
+		   	  	}
+		   	  }
+		   	  arr.refresh();
+		   	  temp = "";
+		   }
+	]]>
+</mx:Script>
+    <mx:ViewStack id="v1" height="100%" width="100%">
+        <mx:Canvas>
+        	<mx:RadioButton x="80.5" y="26" label="swf" groupName="choose"/>
+			<mx:RadioButton x="80.5" y="56" label="元件" groupName="choose"/>
+			<mx:Button x="72.5" y="93" label="下一步" click="next()"/>
+        </mx:Canvas>
+        <mx:Canvas id="cav2">
+            <mx:List dataProvider="{arr}" x="25" y="27" width="196"
+            	itemClick="listClick(event)" height="69"></mx:List>
+            <mx:TextInput id="symbolName" x="61" y="3" width="69"/>
+            <mx:Button paddingLeft="0" paddingRight="0" x="138" y="1" label="输入" click="input()" width="36"/>
+            <mx:Button paddingLeft="0" paddingRight="0" x="178" y="1" label="删除" click="remove()" width="36"/>
+            <mx:Label x="22" y="5" text="元件名:"/>
+            <mx:Button x="61" y="129" label="确定并选择文件" click="loadFile()"/>
+            <mx:CheckBox x="71" y="99" label="需要程序帮你查找?" id="check"/>
+        </mx:Canvas>
+    </mx:ViewStack>
+</mx:TitleWindow>
