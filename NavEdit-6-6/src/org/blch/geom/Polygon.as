@@ -581,7 +581,14 @@ package org.blch.geom
 			}
 			return rs;
 		}
-		
+		public function getAllLine():Array{
+			var ary:Array = new Array;
+			for(var i:int=0;i<vertexV.length-1;i++){
+				ary.push(new Line2D(vertexV[i],vertexV[i+1]));
+			}
+			ary.push(new Line2D(vertexV[vertexV.length-1],vertexV[0]));
+			return ary;
+		}
 		public function writeFile():String{
 			var rs:String =  int(vertexV[0].x) + "," + int(vertexV[0].y);
 			for (var i:int=1; i<this.vertexV.length; i++) {
