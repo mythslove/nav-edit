@@ -192,6 +192,11 @@ package org.blch.geom
 		{
 			return _sides;
 		}
-
+		public function writeFile():String{
+			var str:String = 
+			this.getVertex(0).x + "," + this.getVertex(0).y + "," 
+				+ this.getVertex(1).x + "," + this.getVertex(1).y + "," +this.getVertex(2).x + "," + this.getVertex(2).y;
+			return str;
+		}
 	}
 }
