@@ -348,14 +348,14 @@ package view.map
 			fs.writeUTFBytes(str);
 			fs.close();
 			
-			file = new File(basicurl + "/" + murl + ".jpg")// File.documentsDirectory.resolvePath("navMap/" + murl + ".navmap");
+			file = new File(basicurl + "/" + murl + "-sky.jpg")// File.documentsDirectory.resolvePath("navMap/" + murl + ".navmap");
 			fs.open(file,FileMode.WRITE);
-			var sxy:Number = 0.7;
+			var sxy:Number = 1;
 			var bitmap:BitmapData = new BitmapData(model.mapWidth*sxy,model.mapHeight*sxy,true,0);
 			var ma:Matrix = new Matrix()
 			ma.scale(sxy,sxy);
 			bitmap.draw(bg,ma);
-			var byte:ByteArray = new JPEGEncoder(50).encode(bitmap);
+			var byte:ByteArray = new JPEGEncoder(100).encode(bitmap);
 			fs.writeBytes(byte);
 			fs.close();
 			
