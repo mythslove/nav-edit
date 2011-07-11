@@ -418,6 +418,22 @@ package org.blch.findPath
 			pathArr.push(end.toPoint());
 			return pathArr;
 		}
+		public function changeCell(cellPath:Vector.<Cell>,wayPoint:WayPoint):void{
+			for(var i:int=0;i<cellPath.length;i++){
+				if(cellPath[i].pointA.x == wayPoint.position.x && cellPath[i].pointA.y == wayPoint.position.y ){
+					wayPoint.cell = cellPath[i+1];
+					return;
+				}
+				if(cellPath[i].pointB.x == wayPoint.position.x && cellPath[i].pointB.y == wayPoint.position.y ){
+					wayPoint.cell = cellPath[i+1];
+					return;
+				}
+				if(cellPath[i].pointC.x == wayPoint.position.x && cellPath[i].pointC.y == wayPoint.position.y ){
+					wayPoint.cell = cellPath[i+1];
+					return;
+				}
+			}
+		}
 		private function fixedWayPoint(first:WayPoint,second:WayPoint,third:WayPoint,cellPath:Vector.<Cell>):void{
 			var line1:Vector2f = new Vector2f(second.position.x - first.position.x,second.position.y - first.position.y).normalize();
 			trace("____________",line1.x,line1.y)
