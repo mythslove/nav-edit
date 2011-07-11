@@ -339,12 +339,22 @@ package view.map
 			var mapdataStr:String = '';
 			for(var i:int=0;i<triangleV.length;i++){
 				trg = triangleV[i];
-				mapdataStr += trg.getVertex(0).writeFile() +  trg.getVertex(1).writeFile() +  trg.getVertex(2).writeFile();
-				//fs.writeUTFBytes(str);
+				mapdataStr += trg.writeFile();
+				for(j=0;j<blockPolygonV.length;j++){
+					pol = blockPolygonV[j];
+					if(isInsert(trg,pol)){
+						mapdataStr += "," + j;
+					}
+				}
+				mapdataStr += "|";
+				//mapdataStr += trg.getVertex(0).writeFile() +  trg.getVertex(1).writeFile() +  trg.getVertex(2).writeFile();
 			}
+			mapdataStr = mapdataStr.substr(0,mapdataStr.length-1);
+			
+			
 			str = "<map name='" + model.mapname + "' mapwidth='" + 
 				model.mapWidth + "' mapheight='" + model.mapHeight + "' picw='" + 
-				model.picw + "' pich='" + model.picH + "' mapdata='" + mapdataStr + "'/>"
+				model.picw + "' pich='" + model.picH + "' mapdata='" + mapdataStr + "' blockdata='" + blockStr +"'/>"
 			fs.writeUTFBytes(str);
 			fs.close();
 			
@@ -362,6 +372,34 @@ package view.map
 			this.removeEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.CLICK,setFindPath);
 		}
+		private function isInsert(trg:Triangle,pol:Polygon):Boolean{
+			var PolV:Array = pol.getAllLine();
+			for(var i:int=0;i<3;i++){
+				var l:Line2D = trg.getSide(i);
+				var insertAry:Array = getInsert(l,PolV);
+				if(insertAry.length > 0){
+					return true;
+				}
+			}
+			return false;
+		}
+		public function getInsert(line:Line2D,lineAry:Array):Array{
+			var ary:Array = new Array;
+			for(var i:int;i<lineAry.length;i++){
+				var p:Vector2f = new Vector2f();
+				var testLine:Line2D = lineAry[i];
+				trace("测试线段" + "(" + testLine.pointA.x + "," + testLine.pointA.y + ")>>>(" + testLine.pointB.x + "," + testLine.pointB.y + ")");
+				var result:int = line.intersection(testLine,p)
+				trace("result " + result);
+				if(result==2){
+					p.x = int(p.x);
+					p.y = int(p.y);
+					ary.push(p);
+				}
+			}
+			return ary;
+		}
+		
 		private function outConvexPoint():void{
 			var ary:Vector.<Vector2f> = Polygon(polygonV[0]).vertexV;
 			trace("原来的点数" + ary.length);
