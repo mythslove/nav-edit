@@ -21,7 +21,7 @@ package org.blch.findPath
 	 * @langversion ActionScript 3.0
 	 * @playerversion Flash 10.0
 	 */
-	public class NavMesh extends Sprite
+	public class NavMesh45 extends Sprite
 	{
 		public static const EPSILON:Number = 0.000000;	//精度
 		
