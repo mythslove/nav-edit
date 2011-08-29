@@ -365,9 +365,9 @@ package view.map
 			var ma:Matrix = new Matrix()
 			ma.scale(sxy,sxy);
 			bitmap.draw(bg,ma);
-			var byte:ByteArray = new JPEGEncoder(100).encode(bitmap);
+			/*var byte:ByteArray = new JPEGEncoder(100).encode(bitmap);
 			fs.writeBytes(byte);
-			fs.close();
+			fs.close();*/
 			
 			this.removeEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.CLICK,setFindPath);
