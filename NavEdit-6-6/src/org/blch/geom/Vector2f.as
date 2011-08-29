@@ -467,6 +467,10 @@ package org.blch.geom
 			return Math.abs(x-vec.x) < epsilon	&& Math.abs(y-vec.y) < epsilon;
 		}
 		
+		public function equal(vec:Vector2f):Boolean{
+			return x-vec.x == 0	&& y-vec.y == 0;
+		}
+		
 		public function clone():Vector2f {
 			return new Vector2f(x, y);
 		}
