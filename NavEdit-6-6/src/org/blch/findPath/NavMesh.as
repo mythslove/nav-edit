@@ -12,6 +12,7 @@ package org.blch.findPath
 	import flash.utils.getTimer;
 	
 	import org.blch.geom.Line2D;
+	import org.blch.geom.PathPoint;
 	import org.blch.geom.PointClassification;
 	import org.blch.geom.Vector2f;
 	import org.blch.util.Heap;
@@ -88,7 +89,6 @@ package org.blch.findPath
 			trace(outPath);
 			//画路径线
 			if (outPath != null && outPath.length > 1) {
-//				trace("画路径线");
 				this.graphics.lineStyle(2, 0xffff00);
 				this.graphics.moveTo(outPath[0].x, outPath[0].y);
 				for (var m:int=1; m<outPath.length; m++) {
@@ -234,6 +234,8 @@ package org.blch.findPath
 			
 			//初始化上次计算估价值的终点为目标点
 			endCell.countPoint = endPos;
+			endCell.pathPointOne = new PathPoint(endPos,0,0,endCell,null);
+			endCell.pathPointTwo = new PathPoint(endPos,0,0,endCell,null);
 			openList.put(endCell);
 			endCell.f = 0;
 			endCell.h = 0;
@@ -283,6 +285,7 @@ package org.blch.findPath
 							
 //							adjacentTmp.f = currNode.f + adjacentTmp.m_WallDistance[Math.abs(i - currNode.m_ArrivalWall)];
 							
+							getPathPoint(currNode,adjacentTmp,startPos);
 							//修改估价函数为起始点到顶点间最小的函数		
 							adjacentTmp.f = currNode.f + contFValue(currNode.countPoint,adjacentTmp);
 							
@@ -338,7 +341,74 @@ package org.blch.findPath
 				return null;
 			}
 		}
+		public function getPathPoint(currNode:Cell,adjacentTmp:Cell,startPos:Vector2f):void{
+			var first:Vector2f;
+			var second:Vector2f;
+			if(currNode.countPoint){
+				for(var i:int=0;i<3;i++){
+					for(var j:int=0;j<3;j++){
+						if(currNode.getVertex(i).equal(adjacentTmp.getVertex(j))){
+							if(first){
+								second = adjacentTmp.getVertex(j);
+								break;
+							}else{
+								first = adjacentTmp.getVertex(j);
+							}
+						}
+					}
+				}
+				
+				adjacentTmp.pathPointOne = new PathPoint(first,getDis(first,currNode.countPoint),
+					getDis(first,startPos),adjacentTmp,currNode.pathPointOne);
+				adjacentTmp.pathPointTwo = new PathPoint(second,getDis(second,currNode.countPoint),
+					getDis(second,startPos),adjacentTmp,currNode.pathPointTwo);
+				
+			}else{
+				setMinPoint(currNode.pathPointOne,adjacentTmp,startPos,adjacentTmp.pathPointOne);
+				setMinPoint(currNode.pathPointTwo,adjacentTmp,startPos,adjacentTmp.pathPointTwo);
+			}
+			
+			
+		}
+		public function setMinPoint(currPoint:PathPoint,adjacentTmp:Cell,startPos:Vector2f,resultpaht:PathPoint):void{
+			var p:Vector2f = currPoint.p;
+			
+			var result:int = 0;
+			
+			var aF:int = countFValue(p,adjacentTmp.pointA);
+			var bF:int = countFValue(p,adjacentTmp.pointB);
+			var cF:int = countFValue(p,adjacentTmp.pointC);
+			
+			
+			if(aF>bF){
+				if(bF > cF){
+					//c
+					resultpaht = new PathPoint(adjacentTmp.pointC,currPoint.g + cF,
+						getDis(adjacentTmp.pointC,startPos),adjacentTmp,currPoint);
+				}else{
+					//b
+					resultpaht = new PathPoint(adjacentTmp.pointB,currPoint.g + bF,
+						getDis(adjacentTmp.pointB,startPos),adjacentTmp,currPoint);
+				}
+			}else {
+				if(aF > cF){
+					//c
+					resultpaht = new PathPoint(adjacentTmp.pointC,currPoint.g + cF,
+						getDis(adjacentTmp.pointC,startPos),adjacentTmp,currPoint);
+				}else{
+					//a
+					resultpaht = new PathPoint(adjacentTmp.pointA,currPoint.g + aF,
+						getDis(adjacentTmp.pointA,startPos),adjacentTmp,currPoint);
+				}
+			}
+			
+		}
 		
+		private function getDis(f:*,s:*):Number{
+			var xx:Number = f.x-s.x;
+			var yy:Number = f.y-s.y;
+			return Math.sqrt(xx*xx+yy*yy);
+		}
 		/**
 		 * 路径经过的网格
 		 * @return 

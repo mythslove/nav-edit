@@ -9,6 +9,7 @@ package org.blch.findPath
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
 	
+	import org.blch.geom.PathPoint;
 	import org.blch.geom.Triangle;
 	import org.blch.geom.Vector2f;
 	
@@ -28,6 +29,9 @@ package org.blch.findPath
 		public var isOpen:Boolean = false;
 		public var parent:Cell;
 		public var countPoint:Vector2f;
+		public var pathPointOne:PathPoint;
+		public var pathPointTwo:PathPoint;
+		
 		
 		public var m_ArrivalWall:int; // the side we arrived through.
 		public var m_WallMidpoint:Vector.<Vector2f>; // 每个边的中点
