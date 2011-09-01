@@ -40,7 +40,7 @@ package org.blch.findPath
 			m_CellVector = cellVector;
 			g = this.graphics;
 			//
-			openList = new Heap(m_CellVector.length, function(a:Cell, b:Cell):int { return b.f + b.h - a.f - a.h; });
+			openList = new Heap(m_CellVector.length, function(a:PathPoint, b:PathPoint):int { return b.f - a.f;});
 			closeList = new Array();
 		}
 		
@@ -236,7 +236,7 @@ package org.blch.findPath
 			endCell.countPoint = endPos;
 			endCell.pathPointOne = new PathPoint(endPos,0,0,endCell,null);
 			endCell.pathPointTwo = new PathPoint(endPos,0,0,endCell,null);
-			openList.put(endCell);
+			openList.put(endCell.pathPointOne);
 			endCell.f = 0;
 			endCell.h = 0;
 			endCell.isOpen = false;
@@ -250,8 +250,9 @@ package org.blch.findPath
 			while (openList.size > 0) {
 //				trace(openList.size);
 				// 1. 把当前节点从开放列表删除, 加入到封闭列表
-				currNode = openList.pop();
-				closeList.push(currNode);
+				var p:PathPoint = openList.pop()
+				currNode = p.cell;
+				closeList.push(p);
 //				trace(openList.size);
 //				trace("*****", currNode);
 				
@@ -273,6 +274,7 @@ package org.blch.findPath
 						continue;
 					} else {
 						adjacentTmp = m_CellVector[adjacentId];
+						//trace('当前id' + adjacentId)
 					}
 					
 					if (adjacentTmp != null) {
@@ -287,17 +289,17 @@ package org.blch.findPath
 							
 							getPathPoint(currNode,adjacentTmp,startPos);
 							//修改估价函数为起始点到顶点间最小的函数		
-							adjacentTmp.f = currNode.f + contFValue(currNode.countPoint,adjacentTmp);
+				//			adjacentTmp.f = currNode.f + contFValue(currNode.countPoint,adjacentTmp);
 							
 							//H和F值
-//							adjacentTmp.computeH(startPos);
-							adjacentTmp.computeH(startPos,adjacentTmp.countPoint);
+				//			adjacentTmp.computeH(startPos,adjacentTmp.countPoint);
 							
 							
-							g.moveTo(currNode.countPoint.x,currNode.countPoint.y);
-							g.lineTo(adjacentTmp.countPoint.x,adjacentTmp.countPoint.y);
+							//g.moveTo(currNode.countPoint.x,currNode.countPoint.y);
+							//g.lineTo(adjacentTmp.countPoint.x,adjacentTmp.countPoint.y);
 							//放入开放列表并排序
-							openList.put(adjacentTmp);
+							openList.put(adjacentTmp.pathPointOne);
+							openList.put(adjacentTmp.pathPointTwo);
 							
 							// remember the side this caller is entering from
 							adjacentTmp.setAndGetArrivalWall(currNode.index);
@@ -309,7 +311,7 @@ package org.blch.findPath
 //							currNode.f + adjacentTmp.m_WallDistance[Math.abs(i - currNode.m_ArrivalWall)]
 
 //								var curTmp = Cell(this.clone(adjacentTmp));
-								var back:Vector2f = null;
+								/*var back:Vector2f = null;
 								
 								var result:int = contFValue1(currNode.countPoint,adjacentTmp,back);
 								
@@ -321,9 +323,21 @@ package org.blch.findPath
 									adjacentTmp.h = curH;
 									adjacentTmp.parent = currNode;
 									
-									// remember the side this caller is entering from
 									adjacentTmp.setAndGetArrivalWall(currNode.index);
-								}
+								}*/
+								var result1:PathPoint = setMinPoint(currNode.pathPointOne,adjacentTmp,startPos,1,true);
+								var result2:PathPoint = setMinPoint(currNode.pathPointTwo,adjacentTmp,startPos,2,true);
+								
+								var r3:PathPoint = adjacentTmp.pathPointOne;
+								var r4:PathPoint = adjacentTmp.pathPointTwo;
+								var ary:Array = [result1,result2,r3,r4];
+								//ary.push();
+								ary.sortOn("f",Array.NUMERIC);
+								
+								adjacentTmp.pathPointOne = ary[0];
+								adjacentTmp.pathPointTwo = ary[1];
+								
+								
 							} else {//已在closeList中
 								adjacentTmp = null;
 								continue;
@@ -364,16 +378,17 @@ package org.blch.findPath
 					getDis(second,startPos),adjacentTmp,currNode.pathPointTwo);
 				
 			}else{
-				setMinPoint(currNode.pathPointOne,adjacentTmp,startPos,adjacentTmp.pathPointOne);
-				setMinPoint(currNode.pathPointTwo,adjacentTmp,startPos,adjacentTmp.pathPointTwo);
+				setMinPoint(currNode.pathPointOne,adjacentTmp,startPos,1);
+				setMinPoint(currNode.pathPointTwo,adjacentTmp,startPos,2);
 			}
 			
 			
 		}
-		public function setMinPoint(currPoint:PathPoint,adjacentTmp:Cell,startPos:Vector2f,resultpaht:PathPoint):void{
+		public function setMinPoint(currPoint:PathPoint,adjacentTmp:Cell,startPos:Vector2f,flag:int,compare:Boolean=false):PathPoint{
 			var p:Vector2f = currPoint.p;
 			
 			var result:int = 0;
+			var resultpaht:PathPoint;
 			
 			var aF:int = countFValue(p,adjacentTmp.pointA);
 			var bF:int = countFValue(p,adjacentTmp.pointB);
@@ -401,7 +416,14 @@ package org.blch.findPath
 						getDis(adjacentTmp.pointA,startPos),adjacentTmp,currPoint);
 				}
 			}
-			
+			if(!compare){
+				if(flag == 1){
+					adjacentTmp.pathPointOne = resultpaht;
+				}else if(flag == 2){
+					adjacentTmp.pathPointTwo = resultpaht;
+				}
+			}
+			return resultpaht;
 		}
 		
 		private function getDis(f:*,s:*):Number{
@@ -416,26 +438,30 @@ package org.blch.findPath
 		private function getCellPath():Vector.<Cell> {
 			var pth:Vector.<Cell> = new Vector.<Cell>();
 			
-			var st:Cell = closeList[closeList.length-1];
+			var p:PathPoint = closeList[closeList.length-1]
+			var st:Cell = p.cell;
 			pth.push(st);
 						
-			while (st.parent != null) {
+			while (p.parent != null) {
 //				trace("&&&&&", st.parent);
-				this.graphics.beginFill(0x0000ff, 0.2);
-				st.draw(this.graphics);
-				this.graphics.endFill();
 				
-				pth.push(st.parent);
-				st = st.parent;
+				/*this.graphics.beginFill(0x0000ff, 0.2);
+				p.cell.draw(this.graphics);
+				this.graphics.endFill();*/
+				
+				pth.push(p.parent.cell);
+				p = p.parent;
 			}
 			
-			this.graphics.beginFill(0x0000ff, 0.2);
+			/*this.graphics.beginFill(0x0000ff, 0.2);
 			st.draw(this.graphics);
 			this.graphics.endFill();
 			
-			trace(pth);
+			trace(pth);*/
 			return pth;
 		}
+		
+		
 		
 		/**
 		 * 根据经过的三角形返回路径点(下一个拐角点法)
@@ -444,7 +470,6 @@ package org.blch.findPath
 		 * @return Point数组
 		 */		
 		private function getPath(start:Vector2f, end:Vector2f):Array {
-			//经过的三角形
 			var cellPath:Vector.<Cell> = getCellPath();
 			//没有路径
 			if (cellPath == null || cellPath.length == 0) {
@@ -453,7 +478,6 @@ package org.blch.findPath
 			
 			//保存最终的路径（Point数组）
 			var pathArr:Array = new Array();
-			var waypathArr:Array = new Array();
 			
 			//开始点
 			pathArr.push(start.toPoint());	
@@ -464,6 +488,29 @@ package org.blch.findPath
 			}
 			
 			//获取路点
+			var wayPoint:WayPoint = new WayPoint(cellPath[0], start);
+			while (!wayPoint.position.equals(end)) {
+				wayPoint = this.getFurthestWayPoint(wayPoint, cellPath, end);
+				changeCell(cellPath,wayPoint);
+				pathArr.push(wayPoint.position);
+			}
+			
+			//			pathArr.push(end.toPoint());
+			return pathArr;
+			/*var cellPath:Vector.<Cell> = getCellPath();
+			if (cellPath == null || cellPath.length == 0) {
+				return null;
+			}
+			
+			var pathArr:Array = new Array();
+			var waypathArr:Array = new Array();
+			
+			pathArr.push(start.toPoint());	
+			if (cellPath.length == 1) {		
+				pathArr.push(end.toPoint());	//结束点
+				return pathArr;
+			}
+			
 			var wayPoint:WayPoint = new WayPoint(cellPath[0], start);
 			wayPoint.active = true;
 			waypathArr.push(wayPoint);
@@ -479,14 +526,13 @@ package org.blch.findPath
 				if(wayPoint.position.equals(end)){
 					break;
 				}
-				//pathArr.push(wayPoint.position);
 			}
 			
 			for(var i:int=0;i<waypathArr.length;i++){
 				pathArr.push(waypathArr[i].position);
 			}
 			pathArr.push(end.toPoint());
-			return pathArr;
+			return pathArr;*/
 		}
 		public function changeCell(cellPath:Vector.<Cell>,wayPoint:WayPoint):void{
 			for(var i:int=0;i<cellPath.length;i++){

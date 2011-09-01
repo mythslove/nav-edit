@@ -17,6 +17,7 @@ package org.blch.geom
 			this.h = h;
 			this.f = g+h;
 			this.parent = parent;
+			this.cell = cell;
 		}
 	}
 }
