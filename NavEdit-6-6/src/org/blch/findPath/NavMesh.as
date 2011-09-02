@@ -225,6 +225,7 @@ package org.blch.findPath
 		 * @param endPos
 		 * @return Point路径数组
 		 */		
+		private var beginCell:Cell;
 		public function buildPath(startCell:Cell, startPos:Vector2f, 
 								  endCell:Cell, endPos:Vector2f):Array {
 			openList.clear();
@@ -242,6 +243,7 @@ package org.blch.findPath
 			endCell.isOpen = false;
 			endCell.parent = null;
 			endCell.sessionId = pathSessionId;
+			beginCell = endCell;
 			
 			var foundPath:Boolean = false;		//是否找到路径
 			var currNode:Cell;				//当前节点
@@ -358,7 +360,7 @@ package org.blch.findPath
 		public function getPathPoint(currNode:Cell,adjacentTmp:Cell,startPos:Vector2f):void{
 			var first:Vector2f;
 			var second:Vector2f;
-			if(currNode.countPoint){
+			if(currNode == beginCell){
 				for(var i:int=0;i<3;i++){
 					for(var j:int=0;j<3;j++){
 						if(currNode.getVertex(i).equal(adjacentTmp.getVertex(j))){
@@ -430,6 +432,10 @@ package org.blch.findPath
 			var xx:Number = f.x-s.x;
 			var yy:Number = f.y-s.y;
 			return Math.sqrt(xx*xx+yy*yy);
+		}
+		
+		private function resetCell():void{
+			
 		}
 		/**
 		 * 路径经过的网格
