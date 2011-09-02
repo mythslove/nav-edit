@@ -33,6 +33,8 @@ package view.map
 	import org.blch.geom.Triangle;
 	import org.blch.geom.Vector2f;
 	
+	import spark.components.mediaClasses.VolumeBar;
+	
 	import view.TenCourse;
 	
 	public class MapManager extends UIComponent
@@ -371,6 +373,7 @@ package view.map
 			
 			this.removeEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.CLICK,setFindPath);
+			this.addEventListener(MouseEvent.MOUSE_MOVE,setFindPathMove);
 		}
 		private function isInsert(trg:Triangle,pol:Polygon):Boolean{
 			var PolV:Array = pol.getAllLine();
@@ -575,7 +578,7 @@ package view.map
 		private var startPt:Point;
 		private var endPt:Point;
 		private function setFindPath(e:MouseEvent):void {
-			if (startPtSign) {
+			/*if (startPtSign) {
 				endPt = new Point(e.localX, e.localY);
 				startPtSign = false;
 				
@@ -597,9 +600,32 @@ package view.map
 				pathShape.graphics.beginFill(0x00ff00);
 				pathShape.graphics.drawCircle(startPt.x, startPt.y, 3);
 				pathShape.graphics.endFill();
-			}
+			}*/
+			startPt = new Point(e.localX, e.localY);
+			startPtSign = true;
+			
+			pathShape.graphics.beginFill(0x00ff00);
+			pathShape.graphics.drawCircle(startPt.x, startPt.y, 3);
+			pathShape.graphics.endFill();
 		}
-		
+		private function setFindPathMove(e:MouseEvent):void{
+			if (startPtSign) {
+				endPt = new Point(e.localX, e.localY);
+				//startPtSign = false;
+				
+				pathShape.graphics.beginFill(0xff0000);
+				pathShape.graphics.drawCircle(endPt.x, endPt.y, 3);
+				pathShape.graphics.endFill();
+				
+				if(pathShape.numChildren){
+					pathShape.removeChildAt(0);
+				}
+				
+				var nav:NavMesh = new NavMesh(cellV);
+				pathShape.addChild(nav);
+				nav.findPath(startPt, endPt);
+			} 
+		}
 		
 	}
 }
