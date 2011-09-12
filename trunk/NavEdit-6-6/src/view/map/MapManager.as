@@ -6,6 +6,7 @@ package view.map
 	
 	import flash.display.BitmapData;
 	import flash.display.Shape;
+	import flash.display.SpreadMethod;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -56,6 +57,7 @@ package view.map
 		private var course:TenCourse;
 		private var polygonV:Vector.<Polygon>;
 		private var blockPolygonV:Vector.<Polygon>;
+		private var crossBlockPolygonV:Vector.<Polygon>;
 		private var triangleV:Vector.<Triangle>; 	//生成的Delaunay三角形
 		private var cellV:Vector.<Cell>;
 		private var murl:String = "CJ305";
@@ -72,6 +74,7 @@ package view.map
 			this.addEventListener(MouseEvent.CLICK,onClick);
 			polygonV = new Vector.<Polygon>();
 			blockPolygonV = new Vector.<Polygon>();
+			crossBlockPolygonV = new Vector.<Polygon>;
 		}
 		private function initCourse():void{
 			course = new TenCourse();
@@ -87,6 +90,8 @@ package view.map
 				addEdgeBug(event);
 			}else if(model.step == 2){
 				addBlock(event);
+			}else if(model.step == 3){
+				addCrossBlock(event);
 			}
 		}
 		private function addBlock(event:MouseEvent):void{
@@ -112,6 +117,38 @@ package view.map
 					pl.addEventListener("removePol",removePolygon);
 					pl.setDrawColor(0x00ff00,0x7d00dd,0x7d00dd);
 					pl.draw(true);
+				} else {
+					drawPath.push(vt);
+					blockS.graphics.lineTo(event.localX,event.localY);
+					blockS.graphics.drawCircle(event.localX,event.localY,3);
+				}
+			}
+		}
+		
+		private function addCrossBlock(event:MouseEvent):void{
+			if(model.addState != 0){
+				return;
+			}
+			var vt:Vector2f = new Vector2f(event.localX,event.localY);
+			blockS.graphics.lineStyle(3,0x00ff00,1);
+			if (drawPath.length == 0) {
+				blockS.graphics.moveTo(event.localX,event.localY);
+				drawPath.push(vt);
+				blockS.graphics.drawCircle(event.localX,event.localY,3);
+			} else {
+				if (vt.distanceSquared(drawPath[0]) < 100) {
+					vt = drawPath[0];
+					var pl:Polygon = new Polygon(drawPath.length, drawPath);
+					drawPath = new Vector.<Vector2f>();
+					blockS.graphics.lineTo(event.localX,event.localY);
+					pl.rw();
+					crossBlockPolygonV.push(pl);
+					blockContainer.addChild(pl);
+					blockS.graphics.clear();
+					pl.addEventListener("removePol",removePolygon);
+					pl.setDrawColor(0x00ff00,0x17a0e7,0x7d00dd);
+					pl.draw(true);
+					pl.drawCircle();
 				} else {
 					drawPath.push(vt);
 					blockS.graphics.lineTo(event.localX,event.localY);
@@ -305,6 +342,11 @@ package view.map
 				cell.drawIndex(this);
 			}
 			linkCells(cellV);
+			for(j=0; j<cellV.length; j++){
+				cell = cellV[j];
+				drawLink(cell);
+			}
+			//this.addChild(wangS);
 			
 			var file:File;
 			var fs:FileStream = new FileStream();
@@ -360,20 +402,42 @@ package view.map
 			fs.writeUTFBytes(str);
 			fs.close();
 			
-			file = new File(basicurl + "/" + murl + "-sky.jpg")// File.documentsDirectory.resolvePath("navMap/" + murl + ".navmap");
+			file = new File(basicurl + "/" + murl + "-sky-mesh.jpg")// File.documentsDirectory.resolvePath("navMap/" + murl + ".navmap");
 			fs.open(file,FileMode.WRITE);
 			var sxy:Number = 1;
 			var bitmap:BitmapData = new BitmapData(model.mapWidth*sxy,model.mapHeight*sxy,true,0);
 			var ma:Matrix = new Matrix()
 			ma.scale(sxy,sxy);
-			bitmap.draw(bg,ma);
-			/*var byte:ByteArray = new JPEGEncoder(100).encode(bitmap);
+			bitmap.draw(wangS,ma);
+			/*var byte:ByteArray = new JPEGEncoder(50).encode(bitmap);
 			fs.writeBytes(byte);
 			fs.close();*/
 			
 			this.removeEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.CLICK,setFindPath);
-			this.addEventListener(MouseEvent.MOUSE_MOVE,setFindPathMove);
+			//this.addEventListener(MouseEvent.MOUSE_MOVE,setFindPathMove);
+		}
+		private var wangS:Sprite = new Sprite;
+		private function drawLink(currNode:Cell):void{
+			wangS.graphics.lineStyle(3,0xff0000);
+			var adjacentId:int;
+			var lineCell:Cell;
+			for (var i:int=0; i<3; i++) {
+				adjacentId = currNode.links[i];
+				trace(adjacentId)
+				if (adjacentId < 0) {						//不能通过
+					continue;
+				} else {
+					lineCell = cellV[adjacentId];
+					var p1:Point = currNode.getCenter();
+					var p2:Point;
+					if(lineCell){
+						p2 = lineCell.getCenter();
+						wangS.graphics.moveTo(p1.x,p1.y);
+						wangS.graphics.lineTo(p2.x,p2.y);
+					}
+				}
+			}
 		}
 		private function isInsert(trg:Triangle,pol:Polygon):Boolean{
 			var PolV:Array = pol.getAllLine();
@@ -594,7 +658,7 @@ package view.map
 				pathShape.addChild(nav);
 				nav.findPath(startPt, endPt);
 			} else {
-				startPt = new Point(e.localX, e.localY);
+				startPt = new Point(e.localX, e.localY);9
 				startPtSign = true;
 				
 				pathShape.graphics.beginFill(0x00ff00);

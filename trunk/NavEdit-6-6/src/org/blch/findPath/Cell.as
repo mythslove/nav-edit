@@ -5,6 +5,7 @@
 package org.blch.findPath
 {
 	import flash.display.Sprite;
+	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
@@ -31,6 +32,7 @@ package org.blch.findPath
 		public var countPoint:Vector2f;
 		public var pathPointOne:PathPoint;
 		public var pathPointTwo:PathPoint;
+		public var id:int;
 		
 		
 		public var m_ArrivalWall:int; // the side we arrived through.
@@ -291,6 +293,9 @@ package org.blch.findPath
 		public function set index(value:int):void
 		{
 			_index = value;
+		}
+		public function getCenter():Point{
+			return new Point((pointA.x + pointB.x + pointC.x)/3,(pointA.y + pointB.y + pointC.y)/3);
 		}
 	}
 }

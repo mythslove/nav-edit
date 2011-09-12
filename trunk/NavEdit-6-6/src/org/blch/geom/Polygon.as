@@ -7,6 +7,7 @@ package org.blch.geom
 	import __AS3__.vec.Vector;
 	
 	import flash.display.Graphics;
+	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -15,6 +16,8 @@ package org.blch.geom
 	import models.ModelLocator;
 	
 	import mx.controls.Alert;
+	
+	import org.blch.util.GeomUtils;
 	
 	/**
 	 * Polygon
@@ -33,6 +36,9 @@ package org.blch.geom
 		private var lineColor:uint = 0x0000ff;
 		private var pointColor:uint = 0x0000ff;
 		
+		private var circle:Circle;
+		private var circleShape:Shape;
+		
 		public function Polygon(vertexNmu:int, vertexV:Vector.<Vector2f>)
 		{
 			this.vertexNmu = vertexNmu;
@@ -40,6 +46,8 @@ package org.blch.geom
 			addEvent();
 			addPoints();
 			draw();
+			circleShape = new Shape;
+			this.addChild(circleShape);
 			this.addEventListener(MouseEvent.CLICK,onClick)
 		}
 		private function addPoints():void{
@@ -551,12 +559,6 @@ package org.blch.geom
 			this.pointColor = pointColor;
 		}
 		public function draw(block:Boolean=false):void {
-			/*if(g == null){
-				g = graph;
-			}else{
-				graph = g;
-			}
-			*/
 			var g:Graphics = this.graphics;
 			g.clear();
 			if(block){
@@ -574,6 +576,45 @@ package org.blch.geom
 			g.endFill();
 		}
 		
+		public function drawCircle():void{
+			circle = getMinCricle()//GeomUtils.getCircleFormPoint(vertexV[0],vertexV[1],vertexV[2]);
+			circleShape.graphics.lineStyle(2,0x00ffff);
+			circleShape.graphics.drawCircle(circle.center.x,circle.center.y,circle.radius);
+		}
+		private function getMinCricle():Circle{
+			var circleAry:Array = new Array;
+			var circle:Circle;
+			for(var i:int=0;i<vertexV.length;i++){
+				for(var j:int=i;j<vertexV.length;j++){
+					for(var k:int=0;k<vertexV.length;k++){
+						if(k==i || k==j){
+							continue;
+						}
+						circle = GeomUtils.getCircleFormPoint(vertexV[i],vertexV[j],vertexV[k]);
+						var flag:Boolean = true
+						for(var h:int=0;h<vertexV.length;h++){
+							if(h != i && h != j && h != k){
+								if(!circle.isInCircle(vertexV[h])){
+									flag = false;
+								}
+							}
+						}
+						if(flag)
+							circleAry.push(circle);
+					}
+				}
+			}
+			
+			circle = circleAry[0];
+			for(i=0;i<circleAry.length;i++){
+				//trace("test：" + circleAry[i].radius)
+				if(circle.radius > circleAry[i].radius){
+					circle = circleAry[i];
+				}
+			}
+			//trace("result：" + circle.radius)
+			return circle;
+		}
 		override public function toString():String {
 			var rs:String =  "Polygon:";
 			for (var i:int=0; i<this.vertexV.length; i++) {
