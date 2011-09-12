@@ -9,6 +9,7 @@ package org.blch.findPath
 	import flash.geom.Point;
 	import flash.net.registerClassAlias;
 	import flash.utils.ByteArray;
+	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	
 	import org.blch.geom.Line2D;
@@ -276,6 +277,7 @@ package org.blch.findPath
 						continue;
 					} else {
 						adjacentTmp = m_CellVector[adjacentId];
+						adjacentTmp.id = adjacentId;
 						//trace('当前id' + adjacentId)
 					}
 					
@@ -476,6 +478,7 @@ package org.blch.findPath
 		 * @return Point数组
 		 */		
 		private function getPath(start:Vector2f, end:Vector2f):Array {
+			var timers:int = getTimer();
 			var cellPath:Vector.<Cell> = getCellPath();
 			//没有路径
 			if (cellPath == null || cellPath.length == 0) {
@@ -500,7 +503,7 @@ package org.blch.findPath
 				changeCell(cellPath,wayPoint);
 				pathArr.push(wayPoint.position);
 			}
-			
+			trace("优化时间" + (getTimer() - timers))
 			//			pathArr.push(end.toPoint());
 			return pathArr;
 			/*var cellPath:Vector.<Cell> = getCellPath();
