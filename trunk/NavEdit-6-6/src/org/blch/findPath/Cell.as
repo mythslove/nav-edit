@@ -26,6 +26,7 @@ package org.blch.findPath
 		
 		public  var sessionId:int;
 		public var f:int;
+		public var g:int;
 		public var h:int;
 		public var isOpen:Boolean = false;
 		public var parent:Cell;
@@ -208,6 +209,16 @@ package org.blch.findPath
 			h = Math.sqrt(XDelta*XDelta + YDelta*YDelta);
 		}
 		
+		public function setF(lastf:int,lastCenter:Vector2f,end:Vector2f):void{
+			this.g = getDistance(lastCenter,this.center) + lastf;
+			this.h = getDistance(end,this.center);
+			this.f = g+h;
+		}
+		private function getDistance(target:Vector2f,curr:Vector2f):int{
+			var XDelta:Number = target.x - curr.x;
+			var YDelta:Number = target.y - curr.y;
+			return Math.sqrt(XDelta*XDelta + YDelta*YDelta);
+		}
 		/**
 		 * 测试直线与该cell（三角形）的关系
 		 * @param motionPath
