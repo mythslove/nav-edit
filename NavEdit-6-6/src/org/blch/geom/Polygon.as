@@ -36,7 +36,7 @@ package org.blch.geom
 		private var lineColor:uint = 0x0000ff;
 		private var pointColor:uint = 0x0000ff;
 		
-		private var circle:Circle;
+		public var circle:Circle;
 		private var circleShape:Shape;
 		
 		public function Polygon(vertexNmu:int, vertexV:Vector.<Vector2f>)
@@ -605,6 +605,25 @@ package org.blch.geom
 				}
 			}
 			
+			for(i=0;i<vertexV.length;i++){
+				for(j=i;j<vertexV.length;j++){
+					if(i == j){
+						continue;
+					}
+					circle = GeomUtils.getCricleFromTwo(vertexV[i],vertexV[j]);
+					flag = true
+					for(h=0;h<vertexV.length;h++){
+						if(h != i && h != j){
+							if(!circle.isInCircle(vertexV[h])){
+								flag = false;
+							}
+						}
+					}
+					if(flag)
+						circleAry.push(circle);
+				}
+			}
+			
 			circle = circleAry[0];
 			for(i=0;i<circleAry.length;i++){
 				//trace("test：" + circleAry[i].radius)
@@ -637,6 +656,37 @@ package org.blch.geom
 			}
 			return rs;
 		}
+		private var allLine:Array;
+		public function getRatelition(testline:Line2D):Boolean{
+			if(allLine == null){
+				allLine = getAllLine();
+			}
+			var thisline:Line2D;
+			var num:int;
+			for(var i:int;i<allLine.length;i++){
+				thisline = allLine[i];
+				var p:Vector2f = new Vector2f;
+				if(thisline.intersection(testline,p) == LineClassification.SEGMENTS_INTERSECT){
+					if(!(p.equal(testline.pointA) || p.equal(testline.pointB))){
+						return true;
+					}else{
+						num++
+					}
+				}
+			}
+			if(num >= 4){
+				//return true; 
+			}
+			return false;
+		}
+		/*public function writeCircleFile():String{
+			var rs:String =  int(vertexV[0].x) + "," + int(vertexV[0].y);
+			for (var i:int=1; i<this.vertexV.length; i++) {
+				rs += "|" + int(vertexV[i].x) + "," + int(vertexV[i].y);
+			}
+			rs += "*" + circle.center.x + "," + circle.center.y + "," + circle.radius;
+			return rs;
+		}*/
 	}
 }
 

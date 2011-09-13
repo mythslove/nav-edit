@@ -52,14 +52,22 @@ package org.blch.util
 			var x1:Number = (-B+Math.sqrt(B*B-4*A*C))/2/A;
 			var y1:Number = k*x1+b;
 			
-			point1.x = x1;
-			point1.y = y1;
-			
 			var x2:Number = (-B-Math.sqrt(B*B-4*A*C))/2/A;
 			var y2:Number = k*x2+b;
 			
-			point2.x = x2;
-			point2.y = y2;
+			if(line.pointA.x < line.pointB.x){
+				point1.x = x2;
+				point1.y = y2;
+				
+				point2.x = x1;
+				point2.y = y1;
+			}else{
+				point1.x = x1;
+				point1.y = y1;
+				
+				point2.x = x2;
+				point2.y = y2;
+			}
 		}
 		
 		public static function getDistance(a:Vector2f,b:Vector2f):Number{
