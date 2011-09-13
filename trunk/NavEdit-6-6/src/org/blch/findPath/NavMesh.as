@@ -81,7 +81,7 @@ package org.blch.findPath
 			var outPath:Array;
 			
 			if (startCell == endCell) {
-				outPath = [startPointPx, endPointPx];
+				outPath = [startPos, endPos];
 			} else {
 				outPath = buildPath(startCell, startPos, endCell, endPos);
 			}
@@ -89,13 +89,15 @@ package org.blch.findPath
 			trace("寻路时间：", getTimer()-stime);
 			trace(outPath);
 			//画路径线
-			if (outPath != null && outPath.length > 1) {
+			
+			
+			/*if (outPath != null && outPath.length > 1) {
 				this.graphics.lineStyle(2, 0xffff00);
 				this.graphics.moveTo(outPath[0].x, outPath[0].y);
 				for (var m:int=1; m<outPath.length; m++) {
 					this.graphics.lineTo(outPath[m].x, outPath[m].y);
 				}
-			}
+			}*/
 			
 			return outPath;
 		}
@@ -489,10 +491,10 @@ package org.blch.findPath
 			var pathArr:Array = new Array();
 			
 			//开始点
-			pathArr.push(start.toPoint());	
+			pathArr.push(start);	
 			//起点与终点在同一三角形中
 			if (cellPath.length == 1) {		
-				pathArr.push(end.toPoint());	//结束点
+				pathArr.push(end);	//结束点
 				return pathArr;
 			}
 			
@@ -503,7 +505,7 @@ package org.blch.findPath
 				changeCell(cellPath,wayPoint);
 				pathArr.push(wayPoint.position);
 			}
-			trace("优化时间" + (getTimer() - timers))
+			//trace("优化时间" + (getTimer() - timers))
 			//			pathArr.push(end.toPoint());
 			return pathArr;
 			/*var cellPath:Vector.<Cell> = getCellPath();

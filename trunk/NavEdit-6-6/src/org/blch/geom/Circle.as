@@ -15,5 +15,9 @@ package org.blch.geom
 			var dis:Number = Math.sqrt(detlX*detlX + detlY*detlY);
 			return dis<radius;
 		}
+		public function isCross(line:Line2D):Boolean{
+			var dis:Number = Math.abs(line.signedDistance(center));
+			return dis < radius;
+		}
 	}
 }

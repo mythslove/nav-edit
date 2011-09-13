@@ -26,6 +26,7 @@ package view.map
 	import mx.graphics.codec.JPEGEncoder;
 	
 	import org.blch.findPath.Cell;
+	import org.blch.findPath.LineCrossBlock;
 	import org.blch.findPath.NavMesh;
 	import org.blch.geom.Delaunay;
 	import org.blch.geom.Line2D;
@@ -61,6 +62,7 @@ package view.map
 		private var triangleV:Vector.<Triangle>; 	//生成的Delaunay三角形
 		private var cellV:Vector.<Cell>;
 		private var murl:String = "CJ305";
+		private var lineCrossBlock:LineCrossBlock;
 		
 		private var drawPath:Vector.<Vector2f> = new Vector.<Vector2f>();
 		private var model:ModelLocator = ModelLocator.getInstance();
@@ -366,6 +368,12 @@ package view.map
 				pol = blockPolygonV[i];
 				blockStr += "//" + pol.writeFile();
 			}
+			var crossBlockStr:String = crossBlockPolygonV[0].writeFile()
+			for(i=1;i<crossBlockPolygonV.length;i++){
+				pol = crossBlockPolygonV[i];
+				crossBlockStr += "//" + pol.writeFile();
+			}
+			
 			model.mapname = murl;
 			model.mapWidth = mapWidth;
 			model.mapHeight = mapHeight;
@@ -373,7 +381,7 @@ package view.map
 			model.picH = picH;
 			str = "<map name='" + model.mapname + "' mapwidth='" + 
 				model.mapWidth + "' mapheight='" + model.mapHeight + "' picw='" + 
-				model.picw + "' pich='" + model.picH + "' mapdata='" + str + "' blockdata='" + blockStr + "'/>"
+				model.picw + "' pich='" + model.picH + "' mapdata='" + str + "' blockdata='" + blockStr + "' crossBlockdata='" + crossBlockStr + "'/>"
 			
 			fs.writeUTFBytes(str);
 			fs.close();
@@ -415,7 +423,7 @@ package view.map
 			
 			this.removeEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.CLICK,setFindPath);
-			//this.addEventListener(MouseEvent.MOUSE_MOVE,setFindPathMove);
+			this.addEventListener(MouseEvent.MOUSE_MOVE,setFindPathMove);
 		}
 		private var wangS:Sprite = new Sprite;
 		private function drawLink(currNode:Cell):void{
@@ -579,6 +587,7 @@ package view.map
 			createBg(picW,picH);
 			var str:String = String(xml.@mapdata);
 			addBlockBydata(xml.@blockdata);
+			addCrossBlockByData(xml.@crossBlockdata);
 			var ary:Array = str.split("//");
 			for(var i:int=0;i<ary.length;i++){
 				var pol:Polygon;
@@ -601,6 +610,10 @@ package view.map
 			poly0 = polygonV[0]
 			poly0.ismain = true;
 			drawThis();
+			
+			lineCrossBlock = new LineCrossBlock;
+			lineCrossBlock.crossBlockPolygonV = this.crossBlockPolygonV;
+			
 		}
 		private function addBlockBydata(str:String):void{
 			if(str == null){
@@ -624,6 +637,29 @@ package view.map
 				pol.draw(true);
 			}
 		}
+		private function addCrossBlockByData(str:String):void{
+			if(str == null){
+				return;
+			}
+			var ary:Array = str.split("//");
+			for(var i:int=0;i<ary.length;i++){
+				var pol:Polygon;
+				var pointAry:Array = String(ary[i]).split("|");
+				var v0:Vector.<Vector2f> = new Vector.<Vector2f>();
+				for(var j:int=0;j<pointAry.length;j++){
+					var pAry:Array = String(pointAry[j]).split(",");
+					v0.push(new Vector2f(pAry[0], pAry[1]));
+				}
+				pol = new Polygon(v0.length, v0);
+				blockContainer.addChild(pol);
+				pol.addEventListener(Event.CHANGE,edagChange);
+				pol.addEventListener("removePol",removePolygon);
+				crossBlockPolygonV.push(pol);
+				pol.setDrawColor(0x00ff00,0x7d00dd,0x7d00dd);
+				pol.draw(true);
+				pol.drawCircle();
+			}
+		}
 		/**
 		 * 搜索单元网格的邻接网格，并保存链接数据到网格中，以提供给寻路用
 		 * @param pv
@@ -642,7 +678,7 @@ package view.map
 		private var startPt:Point;
 		private var endPt:Point;
 		private function setFindPath(e:MouseEvent):void {
-			/*if (startPtSign) {
+			if (startPtSign) {
 				endPt = new Point(e.localX, e.localY);
 				startPtSign = false;
 				
@@ -656,7 +692,19 @@ package view.map
 				
 				var nav:NavMesh = new NavMesh(cellV);
 				pathShape.addChild(nav);
-				nav.findPath(startPt, endPt);
+				
+				var pathAry:Array = nav.findPath(startPt, endPt);
+				
+				lineCrossBlock.processLine(pathAry);
+				
+				if (pathAry != null && pathAry.length > 1) {
+					nav.graphics.lineStyle(2, 0xffff00);
+					nav.graphics.moveTo(pathAry[0].x, pathAry[0].y);
+					for (var m:int=1; m<pathAry.length; m++) {
+						nav.graphics.lineTo(pathAry[m].x, pathAry[m].y);
+					}
+				}
+				
 			} else {
 				startPt = new Point(e.localX, e.localY);9
 				startPtSign = true;
@@ -664,15 +712,16 @@ package view.map
 				pathShape.graphics.beginFill(0x00ff00);
 				pathShape.graphics.drawCircle(startPt.x, startPt.y, 3);
 				pathShape.graphics.endFill();
-			}*/
-			startPt = new Point(e.localX, e.localY);
+			}
+			/*startPt = new Point(e.localX, e.localY);
 			startPtSign = true;
 			
 			pathShape.graphics.beginFill(0x00ff00);
 			pathShape.graphics.drawCircle(startPt.x, startPt.y, 3);
-			pathShape.graphics.endFill();
+			pathShape.graphics.endFill();*/
 		}
 		private function setFindPathMove(e:MouseEvent):void{
+			return;
 			if (startPtSign) {
 				endPt = new Point(e.localX, e.localY);
 				//startPtSign = false;
@@ -687,7 +736,19 @@ package view.map
 				
 				var nav:NavMesh = new NavMesh(cellV);
 				pathShape.addChild(nav);
-				nav.findPath(startPt, endPt);
+				
+				var pathAry:Array = nav.findPath(startPt, endPt);
+				
+				lineCrossBlock.processLine(pathAry);
+				
+				if (pathAry != null && pathAry.length > 1) {
+					nav.graphics.lineStyle(2, 0xffff00);
+					nav.graphics.moveTo(pathAry[0].x, pathAry[0].y);
+					for (var m:int=1; m<pathAry.length; m++) {
+						nav.graphics.lineTo(pathAry[m].x, pathAry[m].y);
+					}
+				}
+				
 			} 
 		}
 		
