@@ -55,7 +55,7 @@ package org.blch.util
 			var x2:Number = (-B-Math.sqrt(B*B-4*A*C))/2/A;
 			var y2:Number = k*x2+b;
 			
-			if(line.pointA.x < line.pointB.x){
+			if(line.pointA.x > line.pointB.x){
 				point1.x = x2;
 				point1.y = y2;
 				

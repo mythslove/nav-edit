@@ -17,6 +17,7 @@ package view.map
 	import flash.geom.Point;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.text.TextField;
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	
@@ -682,14 +683,14 @@ package view.map
 				endPt = new Point(e.localX, e.localY);
 				startPtSign = false;
 				
-				pathShape.graphics.beginFill(0xff0000);
+				/*pathShape.graphics.beginFill(0xff0000);
 				pathShape.graphics.drawCircle(endPt.x, endPt.y, 3);
 				pathShape.graphics.endFill();
-				
+				*/
 				if(pathShape.numChildren){
 					pathShape.removeChildAt(0);
 				}
-				
+				//pathShape.graphics.clear();
 				var nav:NavMesh = new NavMesh(cellV);
 				pathShape.addChild(nav);
 				
@@ -702,6 +703,14 @@ package view.map
 					nav.graphics.moveTo(pathAry[0].x, pathAry[0].y);
 					for (var m:int=1; m<pathAry.length; m++) {
 						nav.graphics.lineTo(pathAry[m].x, pathAry[m].y);
+						/*trace("draw: " + m,pathAry[m].x, pathAry[m].y)
+						var txt:TextField = new TextField();
+						txt.width = 200;
+						txt.height = 60;
+						txt.text = (pathAry[m].x + "," + pathAry[m].y)
+						txt.x = pathAry[m].x;
+						txt.y = pathAry[m].y;
+						nav.addChild(txt);*/
 					}
 				}
 				
@@ -709,9 +718,9 @@ package view.map
 				startPt = new Point(e.localX, e.localY);9
 				startPtSign = true;
 				
-				pathShape.graphics.beginFill(0x00ff00);
+				/*pathShape.graphics.beginFill(0x00ff00);
 				pathShape.graphics.drawCircle(startPt.x, startPt.y, 3);
-				pathShape.graphics.endFill();
+				pathShape.graphics.endFill();*/
 			}
 			/*startPt = new Point(e.localX, e.localY);
 			startPtSign = true;
