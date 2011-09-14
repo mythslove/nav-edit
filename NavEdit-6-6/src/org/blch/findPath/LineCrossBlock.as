@@ -13,15 +13,20 @@ package org.blch.findPath
 		public var crossBlockPolygonV:Vector.<Polygon>;
 		private var poly:Polygon;
 		private var lineV:Array;
+		private var addList:Object;
 		public function LineCrossBlock()
 		{
 			
 		}
 		public function processLine(outPath:Array):void{
+			if(outPath == null){
+				return;
+			}
 			var line:Line2D;
+			addList = new Object;
 			for(var i:int;i<outPath.length-1;i++){
 				line = new Line2D(outPath[i],outPath[i+1]);
-				lineV = new Array;
+				var lineAry:Array = new Array;
 				for(var j:int=0;j<crossBlockPolygonV.length;j++){
 					if(crossBlockPolygonV[j].circle.isCross(line)){
 						var p1:Vector2f = new Vector2f;
@@ -30,20 +35,40 @@ package org.blch.findPath
 						if((p1.x > line.pointA.x && p1.x > line.pointB.x) || (p1.x < line.pointA.x && p1.x < line.pointB.x) ){
 							continue;
 						}
-						line = new Line2D(p1,p2);
+						var lines:Line2D = new Line2D(p1,p2);
 						poly = crossBlockPolygonV[j];
-						if(poly.getRatelition(line)){
-							getNEWline(line);
+						lineV = new Array;
+						if(poly.getRatelition(lines)){
+							getNEWline(lines);
+						}
+						if(lineV.length > 0){
+							lineV.splice(0,0,p1);
+							lineAry.push(lineV);
 						}
 					}
 				}
+				if(lineAry.length){
+					addList[String(i)] = lineAry;
+				}
 				
-				if(lineV.length > 0){
+				/*if(lineV.length > 0){
 					lineV.splice(0,0,p1);
 					for(j=0;j<lineV.length;j++){
-						outPath.splice(i,0,lineV[j]);
+						outPath.splice(i+1,0,lineV[j]);
 					}
 					i += lineV.length;
+				}*/
+			}
+			
+			for(i=0;i<outPath.length-1;i++){
+				var ary:Array = addList[String(i)];
+				if(ary){
+					for(j=0;j<ary.length;j++){
+						for(var k:int=0;k<ary[j].length;k++){
+							outPath.splice(i+1,0,ary[j][k]);
+						}
+						i += ary[j].length;
+					}
 				}
 			}
 		}
