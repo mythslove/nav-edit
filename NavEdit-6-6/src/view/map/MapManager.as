@@ -703,14 +703,14 @@ package view.map
 					nav.graphics.moveTo(pathAry[0].x, pathAry[0].y);
 					for (var m:int=1; m<pathAry.length; m++) {
 						nav.graphics.lineTo(pathAry[m].x, pathAry[m].y);
-						/*trace("draw: " + m,pathAry[m].x, pathAry[m].y)
+						trace("draw: " + m,pathAry[m].x, pathAry[m].y)
 						var txt:TextField = new TextField();
 						txt.width = 200;
 						txt.height = 60;
 						txt.text = (pathAry[m].x + "," + pathAry[m].y)
 						txt.x = pathAry[m].x;
 						txt.y = pathAry[m].y;
-						nav.addChild(txt);*/
+						nav.addChild(txt);
 					}
 				}
 				

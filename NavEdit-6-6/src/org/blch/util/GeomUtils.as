@@ -56,17 +56,17 @@ package org.blch.util
 			var y2:Number = k*x2+b;
 			
 			if(line.pointA.x > line.pointB.x){
-				point1.x = x2;
-				point1.y = y2;
+				point1.x = int(x2);
+				point1.y = int(y2);
 				
-				point2.x = x1;
-				point2.y = y1;
+				point2.x = int(x1);
+				point2.y = int(y1);
 			}else{
-				point1.x = x1;
-				point1.y = y1;
+				point1.x = int(x1);
+				point1.y = int(y1);
 				
-				point2.x = x2;
-				point2.y = y2;
+				point2.x = int(x2);
+				point2.y = int(y2);
 			}
 		}
 		

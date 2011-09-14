@@ -51,13 +51,6 @@ package org.blch.findPath
 					addList[String(i)] = lineAry;
 				}
 				
-				/*if(lineV.length > 0){
-					lineV.splice(0,0,p1);
-					for(j=0;j<lineV.length;j++){
-						outPath.splice(i+1,0,lineV[j]);
-					}
-					i += lineV.length;
-				}*/
 			}
 			
 			for(i=0;i<outPath.length-1;i++){
