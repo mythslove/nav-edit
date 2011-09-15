@@ -68,6 +68,22 @@ package org.blch.util
 				point2.x = int(x2);
 				point2.y = int(y2);
 			}
+			
+			/*if(line.pointA.x > line.pointB.x){
+				point1.x = int(x1);
+				point1.y = int(y1);
+				
+				point2.x = int(x2);
+				point2.y = int(y2);
+			}else{
+				
+				point1.x = int(x2);
+				point1.y = int(y2);
+				
+				point2.x = int(x1);
+				point2.y = int(y1);
+			}*/
+			
 		}
 		
 		public static function getDistance(a:Vector2f,b:Vector2f):Number{

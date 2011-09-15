@@ -14,6 +14,7 @@ package org.blch.findPath
 		private var poly:Polygon;
 		private var lineV:Array;
 		private var addList:Object;
+		private var flag:Boolean;
 		public function LineCrossBlock()
 		{
 			
@@ -26,7 +27,12 @@ package org.blch.findPath
 			addList = new Object;
 			for(var i:int;i<outPath.length-1;i++){
 				line = new Line2D(outPath[i],outPath[i+1]);
-				var lineAry:Array = new Array;
+				if(line.pointA.x < line.pointB.x){
+					flag = true;
+				}else{
+					flag = false;
+				}
+				var lineAry:Array= new Array;
 				for(var j:int=0;j<crossBlockPolygonV.length;j++){
 					if(crossBlockPolygonV[j].circle.isCross(line)){
 						var p1:Vector2f = new Vector2f;
@@ -35,6 +41,7 @@ package org.blch.findPath
 						if((p1.x > line.pointA.x && p1.x > line.pointB.x) || (p1.x < line.pointA.x && p1.x < line.pointB.x) ){
 							continue;
 						}
+						//trace(crossBlockPolygonV[j].circle.center.x,crossBlockPolygonV[j].circle.center.y);
 						var lines:Line2D = new Line2D(p1,p2);
 						poly = crossBlockPolygonV[j];
 						lineV = new Array;
@@ -43,11 +50,20 @@ package org.blch.findPath
 						}
 						if(lineV.length > 0){
 							lineV.splice(0,0,p1);
-							lineAry.push(lineV);
+							var obj:Object = new Object;
+							obj.dis = crossBlockPolygonV[j].circle.center.x;
+							obj.v = lineV
+							lineAry.push(obj);
 						}
 					}
 				}
 				if(lineAry.length){
+					//lineAry.sort(compare);
+					if(flag){
+						lineAry.sortOn("dis",Array.DESCENDING | Array.NUMERIC);
+					}else{
+						lineAry.sortOn("dis",Array.NUMERIC);
+					}
 					addList[String(i)] = lineAry;
 				}
 				
@@ -57,12 +73,20 @@ package org.blch.findPath
 				var ary:Array = addList[String(i)];
 				if(ary){
 					for(j=0;j<ary.length;j++){
-						for(var k:int=0;k<ary[j].length;k++){
-							outPath.splice(i+1,0,ary[j][k]);
+						for(var k:int=0;k<ary[j].v.length;k++){
+							outPath.splice(i+1,0,ary[j].v[k]);
 						}
 						i += ary[j].length;
 					}
 				}
+			}
+		}
+		
+		private function compare(ary1:Object,ary2:Object):Boolean{
+			if(flag){
+				return ary1.dis < ary2.dis;
+			}else{
+				return ary1.dis > ary2.dis;
 			}
 		}
 		

@@ -65,7 +65,7 @@ package org.blch.findPath
 		
 		public function findPath(startPointPx:Point, endPointPx:Point):Array {
 			
-			var stime:int = getTimer();
+			//var stime:int = getTimer();
 			
 			pathSessionId++;
 			
@@ -86,8 +86,8 @@ package org.blch.findPath
 				outPath = buildPath(startCell, startPos, endCell, endPos);
 			}
 			
-			trace("寻路时间：", getTimer()-stime);
-			trace(outPath);
+			//trace("寻路时间：", getTimer()-stime);
+			//trace(outPath);
 			//画路径线
 			
 			
