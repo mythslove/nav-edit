@@ -694,16 +694,19 @@ package view.map
 				var nav:NavMesh = new NavMesh(cellV);
 				pathShape.addChild(nav);
 				
+				var timer:int = getTimer();
+				
 				var pathAry:Array = nav.findPath(startPt, endPt);
 				
 				lineCrossBlock.processLine(pathAry);
 				
+				trace("time: " + (getTimer() - timer));
 				if (pathAry != null && pathAry.length > 1) {
 					nav.graphics.lineStyle(2, 0xffff00);
 					nav.graphics.moveTo(pathAry[0].x, pathAry[0].y);
 					for (var m:int=1; m<pathAry.length; m++) {
 						nav.graphics.lineTo(pathAry[m].x, pathAry[m].y);
-						trace("draw: " + m,pathAry[m].x, pathAry[m].y)
+						//trace("draw: " + m,pathAry[m].x, pathAry[m].y)
 						var txt:TextField = new TextField();
 						txt.width = 200;
 						txt.height = 60;
