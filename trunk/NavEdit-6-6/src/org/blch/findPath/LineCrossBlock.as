@@ -19,9 +19,9 @@ package org.blch.findPath
 		{
 			
 		}
-		public function processLine(outPath:Array):void{
+		public function processLine(outPath:Array):Array{
 			if(outPath == null){
-				return;
+				return null;
 			}
 			var line:Line2D;
 			addList = new Object;
@@ -64,22 +64,25 @@ package org.blch.findPath
 					}else{
 						lineAry.sortOn("dis",Array.NUMERIC);
 					}
-					addList[String(i)] = lineAry;
+					var newLineAry:Array = new Array;
+					for(var h:int=0;h<lineAry.length;h++){
+						var temp:Array = lineAry[h].v
+						newLineAry = newLineAry.concat(temp);
+					}
+					newLineAry.reverse();
+					addList[String(i)] = newLineAry;
 				}
 				
 			}
-			
-			for(i=0;i<outPath.length-1;i++){
+			var outPutPath:Array = new Array;
+			for(i=0;i<outPath.length;i++){
+				outPutPath.push(outPath[i]);
 				var ary:Array = addList[String(i)];
 				if(ary){
-					for(j=0;j<ary.length;j++){
-						for(var k:int=0;k<ary[j].v.length;k++){
-							outPath.splice(i+1,0,ary[j].v[k]);
-						}
-						i += ary[j].length;
-					}
+					outPutPath = outPutPath.concat(ary);
 				}
 			}
+			return outPutPath;
 		}
 		
 		private function compare(ary1:Object,ary2:Object):Boolean{

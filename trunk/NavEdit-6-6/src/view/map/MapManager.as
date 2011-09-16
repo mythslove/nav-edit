@@ -698,7 +698,7 @@ package view.map
 				
 				var pathAry:Array = nav.findPath(startPt, endPt);
 				
-				lineCrossBlock.processLine(pathAry);
+				pathAry = lineCrossBlock.processLine(pathAry);
 				
 				trace("time: " + (getTimer() - timer));
 				if (pathAry != null && pathAry.length > 1) {
@@ -751,7 +751,7 @@ package view.map
 				
 				var pathAry:Array = nav.findPath(startPt, endPt);
 				
-				lineCrossBlock.processLine(pathAry);
+				pathAry = lineCrossBlock.processLine(pathAry);
 				
 				if (pathAry != null && pathAry.length > 1) {
 					nav.graphics.lineStyle(2, 0xffff00);
