@@ -19,6 +19,9 @@ package org.blch.geom
 		// a vector pointing to the right-hand side of the line when viewed from PointA towards PointB
 		private var m_NormalCalculated:Boolean = false; // normals are only calculated on demand
 		
+		public static const LEFT:String = "left";
+		public static const RIGHT:String = "right";
+		public static const INLINE:String = "inline";
 		
 		public function Line2D(pointA:Vector2f=null, pointB:Vector2f=null)
 		{
@@ -274,6 +277,16 @@ package org.blch.geom
 		
 		public function clone():Line2D {
 			return new Line2D(pointA.clone(), pointB.clone());
+		}
+		
+		public function getOnLineRelation(testP:Vector2f):String{
+			if(testP.x < pointA.x && testP.x < pointB.x){
+				return LEFT;
+			}else if(testP.x > pointA.x && testP.x > pointB.x){
+				return RIGHT;
+			}else{
+				return INLINE;
+			}
 		}
 
 		public function toString():String{
