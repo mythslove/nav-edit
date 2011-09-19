@@ -36,13 +36,21 @@
 			mapManager.createBg(); */
 		}
 		public function onFileSelect(event:*):void{
-			var file:File
+			var file:File;
+			
 			if(event is Event){
 				file = event.target as File
 			}else if(event is File){
 				file = event;
 			}
-			mapManager.setMapInfo(file.parent.url,file.name.split(".")[0]);
+			if(file.extension == "navEdit"){
+				
+			}else if(file.extension == "tailEdit"){
+				
+			}
+			
+			//mapManager.setMapInfo(file.parent.url,file.name.split(".")[0]);
+			
 		}
 		private function scaleXY(event:MouseEvent):void{
 			var tempSclae:Number = mapScale;
@@ -83,42 +91,37 @@
 	]]>
 </mx:Script>
 	
-	<mx:Panel id="mapcontainer" layout="absolute" mouseWheel="scaleXY(event)" top="87" left="10" right="200" bottom="10">
-		<map:MapManager id="mapManager">
-			
-		</map:MapManager>
-	</mx:Panel>
-	<!--<mx:Canvas x="0" y="0" width="100%" height="79" backgroundColor="#D4A747">
-		<mx:Button x="10" y="10" label="NEW" click="createNewMap()"/>
-		<mx:Button x="10" y="45" label="LOAD" click="loadMap()"/>
-		<mx:Button x="511" y="22" label="构建路径" click="mapManager.buildTriangle()"/>
-		<mx:Canvas x="610" y="7" width="99" height="69" borderStyle="outset" visible="{editbtn.selected}">
-			<mx:Button x="11" y="3" label="添加节点" click="addPoint()" height="18"/>
-			<mx:Button x="11" y="24" label="删除节点" click="reducePoint()" height="18"/>
-			<mx:Button x="11" y="45" label="取消" width="80" height="18" click="canclePoint()"/>
+	<mx:ViewStack width="100%" height="100%">
+		<mx:Canvas width="100%" height="100%" backgroundColor="#ffffff">
+			<mx:Button y="238" label="Nav" horizontalCenter="-73"/>
+			<mx:Button y="238" label="Tail" horizontalCenter="74"/>
+			<mx:Button y="308" label="LOAD" width="217" height="85" horizontalCenter="0" click="loadMap()"/>
 		</mx:Canvas>
-		<mx:Button x="212" y="22" label="添加遮挡&gt;" click="setBlock()"/>
-		<mx:Button x="101" y="22" label="设定区域&gt;" click="setEdag()"/>
-		<mx:Button toggle="true" x="137" y="50" label="修改" id="editbtn"/>
-		<mx:Button x="411" y="22" label="传送门"/>
-		<mx:Button x="310" y="22" label="添加障碍&gt;" click="setCrossBlock()"/>
-	</mx:Canvas>-->
-	<mx:TabNavigator x="0" y="0" width="820" height="113">
-		<mx:Canvas x="0" y="0" width="100%" height="79" backgroundColor="#D4A747" name="nav">
-			<mx:Button x="10" y="10" label="NEW" click="createNewMap()"/>
-			<mx:Button x="10" y="45" label="LOAD" click="loadMap()"/>
-			<mx:Button x="511" y="22" label="构建路径" click="mapManager.buildTriangle()"/>
-			<mx:Canvas x="610" y="7" width="99" height="69" borderStyle="outset" visible="{editbtn.selected}">
-				<mx:Button x="11" y="3" label="添加节点" click="addPoint()" height="18"/>
-				<mx:Button x="11" y="24" label="删除节点" click="reducePoint()" height="18"/>
-				<mx:Button x="11" y="45" label="取消" width="80" height="18" click="canclePoint()"/>
+		<mx:Canvas width="100%" height="100%">
+			<mx:Panel id="mapcontainer" layout="absolute" mouseWheel="scaleXY(event)" top="131" left="10" right="200" bottom="10">
+				<map:MapManager id="mapManager">
+				</map:MapManager>
+			</mx:Panel>
+			<mx:Canvas x="0" y="0" width="100%" height="79" backgroundColor="#D4A747" label="nav">
+				<mx:Button x="10" y="10" label="NEW" click="createNewMap()"/>
+				<mx:Button x="10" y="45" label="LOAD" click="loadMap()"/>
+				<mx:Button x="511" y="22" label="构建路径" click="mapManager.buildTriangle()"/>
+				<mx:Canvas x="610" y="7" width="99" height="69" borderStyle="outset" visible="{editbtn.selected}">
+					<mx:Button x="11" y="3" label="添加节点" click="addPoint()" height="18"/>
+					<mx:Button x="11" y="24" label="删除节点" click="reducePoint()" height="18"/>
+					<mx:Button x="11" y="45" label="取消" width="80" height="18" click="canclePoint()"/>
+				</mx:Canvas>
+				<mx:Button x="212" y="22" label="添加遮挡&gt;" click="setBlock()"/>
+				<mx:Button x="101" y="22" label="设定区域&gt;" click="setEdag()"/>
+				<mx:Button toggle="true" x="137" y="50" label="修改" id="editbtn"/>
+				<mx:Button x="411" y="22" label="传送门"/>
+				<mx:Button x="310" y="22" label="添加障碍&gt;" click="setCrossBlock()"/>
 			</mx:Canvas>
-			<mx:Button x="212" y="22" label="添加遮挡&gt;" click="setBlock()"/>
-			<mx:Button x="101" y="22" label="设定区域&gt;" click="setEdag()"/>
-			<mx:Button toggle="true" x="137" y="50" label="修改" id="editbtn"/>
-			<mx:Button x="411" y="22" label="传送门"/>
-			<mx:Button x="310" y="22" label="添加障碍&gt;" click="setCrossBlock()"/>
 		</mx:Canvas>
-	</mx:TabNavigator>
+		<mx:Canvas>
+			
+		</mx:Canvas>
+		
+	</mx:ViewStack>
 	
 </mx:WindowedApplication>
