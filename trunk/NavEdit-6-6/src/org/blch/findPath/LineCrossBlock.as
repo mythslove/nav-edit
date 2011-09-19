@@ -41,6 +41,9 @@ package org.blch.findPath
 						if((p1.x > line.pointA.x && p1.x > line.pointB.x) || (p1.x < line.pointA.x && p1.x < line.pointB.x) ){
 							continue;
 						}
+						if(line.getOnLineRelation(p1) == Line2D.LEFT || line.getOnLineRelation(p2) == Line2D.LEFT){
+							
+						}
 						//trace(crossBlockPolygonV[j].circle.center.x,crossBlockPolygonV[j].circle.center.y);
 						var lines:Line2D = new Line2D(p1,p2);
 						poly = crossBlockPolygonV[j];
