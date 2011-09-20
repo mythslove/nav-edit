@@ -38,10 +38,7 @@
 			}else if(file.extension == "tailEdit"){
 				mainview.selectedIndex = 2;
 			}
-			
 			//mapManager.setMapInfo(file.parent.url,file.name.split(".")[0]);
-			
-			
 			
 		}
 		

@@ -17,6 +17,7 @@ package models
 		public var fileUrl:String;
 		public var fileName:String;
 		
+		
 		private static var instance:ModelLocator;  
   
         public static function getInstance():ModelLocator  
