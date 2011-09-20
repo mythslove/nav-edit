@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas  xmlns:mx="http://www.adobe.com/2006/mxml"  width="100%" height="100%" xmlns:map="view.map.*" creationComplete="canvas1_creationCompleteHandler(event)">
+	<mx:Script>
+		<![CDATA[
+			import com.background.BackgroundLayer;
+			
+			import models.ModelLocator;
+			
+			import mx.events.FlexEvent;
+			import mx.managers.CursorManager;
+			import mx.managers.PopUpManager;
+			
+			import view.MapCreateW;
+			import view.NavMode;
+			private var mapScale:Number = 1;
+			
+			[Embed(source='assets/tool/add.png')]
+			private var addCls:Class;
+			
+			[Embed(source='assets/tool/reduce.png')]
+			private var reduceCls:Class;
+			
+			private var model:ModelLocator = ModelLocator.getInstance();
+			private function init():void{
+				
+			}
+			private function createNewMap():void{
+				var win:MapCreateW = new MapCreateW;
+				PopUpManager.addPopUp(win,this.parent,true);
+				PopUpManager.centerPopUp(win);	  
+			}
+			private function loadMap():void{
+				var file:File = new File;
+				file.addEventListener(Event.SELECT,onFileSelect);
+				file.browseForOpen("选择地图文件");
+			}
+			public function onFileSelect(event:*):void{
+				var file:File;
+				
+				if(event is Event){
+					file = event.target as File
+				}else if(event is File){
+					file = event;
+				}
+				
+				//mapManager.setMapInfo(file.parent.url,file.name.split(".")[0]);
+				
+			}
+			private function scaleXY(event:MouseEvent):void{
+				var tempSclae:Number = mapScale;
+				if(event.delta > 0){
+					mapScale += 0.05;
+				}else{
+					mapScale -= 0.05;
+				}
+				mapcontainer.title = "当前比例：" + int(mapScale*100) + "%";
+				mapManager.scaleX = mapManager.scaleY = mapScale;
+				mapManager.x += mapManager.mouseX * (tempSclae - mapScale);
+				mapManager.y += mapManager.mouseY * (tempSclae - mapScale);
+				trace(mapManager.mouseX,mapManager.mouseY);
+			}
+
+			protected function canvas1_creationCompleteHandler(event:FlexEvent):void
+			{
+				mapManager.setMapInfo(model.fileUrl,model.fileName);
+			}
+			
+			private function setBUG():void{
+				model.tailStep = 1;
+			}
+
+		]]>
+	</mx:Script>
+		
+	<mx:Canvas width="100%" height="100%" backgroundColor="#ffffff">
+		<mx:Button y="238" label="Nav" horizontalCenter="-73"/>
+		<mx:Button y="238" label="Tail" horizontalCenter="74"/>
+		<mx:Button y="308" label="LOAD" width="217" height="85" horizontalCenter="0" click="loadMap()"/>
+	</mx:Canvas>
+	<mx:Canvas width="100%" height="100%">
+		<mx:Panel id="mapcontainer" layout="absolute" mouseWheel="scaleXY(event)" top="87" left="10" right="200" bottom="10">
+			<map:TileMapManager id="mapManager">
+			</map:TileMapManager>
+		</mx:Panel>
+		<mx:Canvas x="0" y="0" width="100%" height="79" backgroundColor="#D4A747" label="nav">
+			<mx:Button x="10" y="10" label="NEW" click="createNewMap()"/>
+			<mx:Button x="10" y="45" label="LOAD" click="loadMap()"/>
+			<mx:Button x="111" y="10" label="SAVE"/>
+			<mx:Button x="206" y="30" label="设置障碍"/>
+			<mx:Button x="294" y="30" label="添加遮挡"/>
+		</mx:Canvas>
+	</mx:Canvas>
+</mx:Canvas>
