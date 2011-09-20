@@ -59,7 +59,11 @@ package view.map
 		private var blockContainer:Sprite;
 		private var course:TenCourse;
 		private var murl:String = "CJ305";
-		private var lineCrossBlock:LineCrossBlock;
+		private var blockDic:Object;
+		private var circleMouse:Shape;
+		private var courseRadius:int;
+		
+		public var resultData:Array;
 		
 		private var model:ModelLocator = ModelLocator.getInstance();
 		public function TileMapManager() 
@@ -67,10 +71,11 @@ package view.map
 			init();
 		}
 		private function init():void{
+			blockDic = new Object;
 			this.addEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
-			this.addEventListener(MouseEvent.MOUSE_DOWN,onMouseUp);
-			this.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
+			this.addEventListener(MouseEvent.MOUSE_UP,onMouseUp);
+			//this.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
 		}
 		
 		public function setMapInfo(baseUrl:String,fileName:String):void{
@@ -144,6 +149,18 @@ package view.map
 			this.picH = int(xml.@pich);
 			createBg(picW,picH);
 			drawBg();
+			initData();
+		}
+		private function initData():void{
+			resultData = new Array;
+			var w:int = mapWidth/64 + 1;
+			var h:int = mapHeight/32 + 1;
+			for(var i:int=0;i<w;i++){
+				resultData[i] = new Array;
+				for(var j:int=0;j<h;j++){
+					resultData[i][j] = 0;
+				}
+			}
 		}
 		private function drawBg():void{
 			shape.graphics.lineStyle(1,0xff0000,0.5);
@@ -200,17 +217,50 @@ package view.map
 		}
 		private function onMouseDown(event:MouseEvent):void{
 			this.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
+			setCourse();
 		}
 		private function onMouseUp(event:MouseEvent):void{
 			this.removeEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
+			removeCourse();
 		}
 		private function onMouseMove(event:MouseEvent):void{
-			drawTail(this.mouseX,this.mouseY)
+			drawCircleTail(this.mouseX,this.mouseY);
+			circleMouse.x = this.mouseX;
+			circleMouse.y = this.mouseY;
 		}
-		private function drawTail(px:int,py:int):void{
-
+		private function setCourse():void{
+			circleMouse = new Shape;
+			this.addChild(circleMouse);
+			courseRadius = 70;
+			//circleMouse.graphics.lineStyle(0x0000ff,1);
+			circleMouse.graphics.beginFill(0x0000ff,0.5);
+			circleMouse.graphics.drawCircle(0,0,courseRadius);
+			circleMouse.graphics.endFill();
+		}
+		private function removeCourse():void{
+			this.removeChild(circleMouse);
+		}
+		private function drawCircleTail(px:int,py:int):void{
 			var p:Point = Util.getTilePoint(px,py);
-			p = Util.getPixelPoint(p.x,p.y);
+			var pxp:Point = Util.getPixelPoint(p.x,p.y);
+			
+			for(var i:int=p.x-3;i<p.x+3;i++){
+				for(var j:int=p.y-3;j<p.y+3;j++){
+					var dp:Point = Util.getPixelPoint(i,j);
+					var dis:Number = Point.distance(dp,pxp);
+					if(dis < courseRadius){
+						drawTail(i,j);
+					}
+				}
+			}
+		}
+		private function drawTail(tx:int,ty:int):void{
+			if(resultData[tx][ty] == 1){
+				return;
+			}
+			resultData[tx][ty] = 1;
+			
+			var p:Point = Util.getPixelPoint(tx,ty);
 			
 			blockS.graphics.moveTo(p.x,p.y-16);
 			blockS.graphics.lineTo(p.x+32,p.y);
