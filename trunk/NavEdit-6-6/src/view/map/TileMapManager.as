@@ -38,6 +38,8 @@ package view.map
 	
 	import spark.components.mediaClasses.VolumeBar;
 	
+	import util.Util;
+	
 	import view.TenCourse;
 	
 	public class TileMapManager extends UIComponent
@@ -66,6 +68,8 @@ package view.map
 		}
 		private function init():void{
 			this.addEventListener(MouseEvent.CLICK,onClick);
+			this.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
+			this.addEventListener(MouseEvent.MOUSE_DOWN,onMouseUp);
 		}
 		
 		public function setMapInfo(baseUrl:String,fileName:String):void{
@@ -194,15 +198,22 @@ package view.map
 			
 		}
 		private function onMouseDown(event:MouseEvent):void{
-			
+			this.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
 		}
 		private function onMouseUp(event:MouseEvent):void{
-			
+			this.removeEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
 		}
 		private function onMouseMove(event:MouseEvent):void{
-			
+			drawTail(this.mouseX,this.mouseY)
 		}
-		private function drawTail(x:int,y:int):void{
+		private function drawTail(px:int,py:int):void{
+			var p:Point = Util.getTilePoint(px,py);
+			p = Util.getPixelPoint(p.x,p.y);
+			
+			blockS.graphics.moveTo(p.x,p.y-16);
+			blockS.graphics.lineTo(p.x+32,p.y);
+			blockS.graphics.lineTo(p.x,p.y+16)
+			blockS.graphics.lineTo(p.x-32,p.y);
 			
 		}
 		
