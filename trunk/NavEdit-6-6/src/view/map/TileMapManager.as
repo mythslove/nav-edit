@@ -70,6 +70,7 @@ package view.map
 			this.addEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
 			this.addEventListener(MouseEvent.MOUSE_DOWN,onMouseUp);
+			this.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
 		}
 		
 		public function setMapInfo(baseUrl:String,fileName:String):void{
