@@ -208,6 +208,7 @@ package view.map
 			drawTail(this.mouseX,this.mouseY)
 		}
 		private function drawTail(px:int,py:int):void{
+
 			var p:Point = Util.getTilePoint(px,py);
 			p = Util.getPixelPoint(p.x,p.y);
 			
