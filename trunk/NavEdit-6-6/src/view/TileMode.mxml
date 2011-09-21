@@ -68,6 +68,7 @@
 			private function setBUG():void{
 				model.tailStep = 1;
 			}
+			
 
 		]]>
 	</mx:Script>

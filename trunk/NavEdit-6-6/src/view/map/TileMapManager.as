@@ -269,6 +269,35 @@ package view.map
 			
 		}
 		
+		private function save():void{
+			var file:File;
+			var fs:FileStream = new FileStream();
+			var str:String;
+			
+			file = new File(basicurl + "/" + murl + ".tailEdit")// File.documentsDirectory.resolvePath("navMap/" + murl + ".mapedit");
+			fs.open(file,FileMode.WRITE);
+			
+			var la:int = resultData[0].length;
+			
+			for(var i:int;i<resultData.length;i++){
+				for(var j:int=0;j<la;j++){
+					str+=resultData[i][j];
+				}
+			}
+			
+			model.mapname = murl;
+			model.mapWidth = mapWidth;
+			model.mapHeight = mapHeight;
+			model.picw = picW;
+			model.picH = picH;
+			str = "<map name='" + model.mapname + "' mapwidth='" + 
+				model.mapWidth + "' mapheight='" + model.mapHeight + "' picw='" + 
+				model.picw + "' pich='" + model.picH + "' mapdata='" + str + "'/>"
+			
+			fs.writeUTFBytes(str);
+			fs.close();
+		}
+		
 		
 	}
 }
