@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" creationComplete="init()" backgroundColor="0x666666">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+<fx:Script>
+	<![CDATA[
+		private var blueBitmapdata:BitmapData;
+		private var alphaBitmapdata:BitmapData;
+		private var bigbitmap:Bitmap
+		private var bigbitmapdata:BitmapData;
+		private function init():void{
+			blueBitmapdata = new BitmapData(64,32,true,0xff00ff00);
+			alphaBitmapdata = new BitmapData(64,32,true,0);
+			
+			bigbitmapdata = new BitmapData(300,300,true,0xff8a3535);
+			bigbitmap = new Bitmap(bigbitmapdata);
+			ui.addChild(bigbitmap);
+			
+			var shape:Shape = new Shape;
+			shape.graphics.beginFill(0xff0000);
+			shape.graphics.drawRect(0,0,64,32);
+			shape.graphics.moveTo(32,0);
+			shape.graphics.lineTo(64,16);
+			shape.graphics.lineTo(32,32);
+			shape.graphics.lineTo(0,16);
+			shape.graphics.lineTo(32,0);
+			shape.graphics.endFill();
+			//ui.addChild(shape);
+			alphaBitmapdata.draw(shape);
+			
+			this.addEventListener(MouseEvent.CLICK,onClick);
+		}
+		private function onClick(event:MouseEvent):void{
+			var rec:Rectangle = new Rectangle(0,0,64,32);
+			var poff:Point = new Point(200,200);
+			var p:Point = new Point(0,0);
+			//bigbitmapdata.copyPixels(blueBitmapdata,rec,p);
+			//bigbitmapdata.copyPixels(blueBitmapdata,rec,p,alphaBitmapdata,p,true);
+			bigbitmapdata.copyChannel(alphaBitmapdata,rec,p,BitmapDataChannel.ALPHA,BitmapDataChannel.ALPHA);
+			p.x += 15;
+			p.y += 15;
+			bigbitmapdata.copyChannel(alphaBitmapdata,rec,p,BitmapDataChannel.ALPHA,BitmapDataChannel.ALPHA);
+			//rec.x = p.x;
+			//rec.y = p.y;
+			bigbitmapdata.threshold(bigbitmapdata,rec,new Point,"<=",0xff000000,0);
+		}
+	]]>
+</fx:Script>
+	<mx:UIComponent id="ui"/>
+</s:Application>

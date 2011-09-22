@@ -69,6 +69,13 @@
 				model.tailStep = 1;
 			}
 			
+			private function setHidde():void{
+				model.tailStep = 2;
+			}
+			
+			private function setErase():void{
+				model.tailStep = 3;
+			}
 
 		]]>
 	</mx:Script>
@@ -87,8 +94,10 @@
 			<mx:Button x="10" y="10" label="NEW" click="createNewMap()"/>
 			<mx:Button x="10" y="45" label="LOAD" click="loadMap()"/>
 			<mx:Button x="111" y="10" label="SAVE"/>
-			<mx:Button x="206" y="30" label="设置障碍"/>
-			<mx:Button x="294" y="30" label="添加遮挡"/>
+			<mx:Button x="206" y="30" label="设置障碍" click="setBUG()"/>
+			<mx:Button x="294" y="30" label="添加遮挡" click="setHidde()"/>
+			<mx:Button x="379" y="30" label="擦除" click="setErase()"/>
+			<mx:HSlider x="111" y="59" width="97"/>
 		</mx:Canvas>
 	</mx:Canvas>
 </mx:Canvas>
