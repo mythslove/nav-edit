@@ -51,9 +51,6 @@
     <application path="NavEdit.mxml">
       <airExcludes/>
     </application>
-    <application path="view/test3.mxml">
-      <airExcludes/>
-    </application>
   </applications>
   <modules/>
   <buildCSSFiles/>

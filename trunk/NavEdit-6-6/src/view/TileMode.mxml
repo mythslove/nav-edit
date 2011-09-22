@@ -7,6 +7,7 @@
 			import models.ModelLocator;
 			
 			import mx.events.FlexEvent;
+			import mx.events.SliderEvent;
 			import mx.managers.CursorManager;
 			import mx.managers.PopUpManager;
 			
@@ -77,6 +78,12 @@
 				model.tailStep = 3;
 			}
 
+
+			protected function rchg_changeHandler(event:SliderEvent):void
+			{
+				mapManager.setRadius(event.value);
+			}
+
 		]]>
 	</mx:Script>
 		
@@ -97,7 +104,7 @@
 			<mx:Button x="206" y="30" label="设置障碍" click="setBUG()"/>
 			<mx:Button x="294" y="30" label="添加遮挡" click="setHidde()"/>
 			<mx:Button x="379" y="30" label="擦除" click="setErase()"/>
-			<mx:HSlider x="111" y="59" width="97"/>
+			<mx:HSlider x="107" y="46" width="97" maximum="200" value="70" id="rchg" change="rchg_changeHandler(event)" minimum="20"/>
 		</mx:Canvas>
 	</mx:Canvas>
 </mx:Canvas>
