@@ -54,6 +54,7 @@ package view.map
 		private var picW:int = 300;
 		private var picH:int = 300;
 		private var shape:Shape;
+		private var shapebitmap:Bitmap;
 		private var lineShpae:Shape;
 		private var lineS:Shape;
 		private var blockBitmap:Bitmap;
@@ -65,7 +66,7 @@ package view.map
 		private var murl:String = "CJ305";
 		private var blockDic:Object;
 		private var circleMouse:Shape;
-		private var courseRadius:int;
+		private var courseRadius:int = 70;
 		
 		private var greenBitmapdata:BitmapData;
 		private var buleBitmapdata:BitmapData;
@@ -91,7 +92,7 @@ package view.map
 			alphaReversBitmapdata = new BitmapData(64,32,true,0);
 			
 			var shape:Shape = new Shape;
-			shape.graphics.beginFill(0xff0000);
+			shape.graphics.beginFill(0x000000);
 			shape.graphics.moveTo(32,0);
 			shape.graphics.lineTo(64,16);
 			shape.graphics.lineTo(32,32);
@@ -102,7 +103,7 @@ package view.map
 			
 			shape.graphics.clear();
 			
-			shape.graphics.beginFill(0xff0000);
+			/*shape.graphics.beginFill(0xff0000);
 			shape.graphics.drawRect(0,0,64,32);
 			shape.graphics.moveTo(32,0);
 			shape.graphics.lineTo(64,16);
@@ -110,7 +111,16 @@ package view.map
 			shape.graphics.lineTo(0,16);
 			shape.graphics.lineTo(32,0);
 			shape.graphics.endFill();
-			alphaBitmapdata.draw(shape);
+			alphaBitmapdata.draw(shape);*/
+			for(var i:int;i<alphaReversBitmapdata.width;i++){
+				for(var j:int=0;j<alphaReversBitmapdata.height;j++){
+					if(alphaReversBitmapdata.getPixel32(i,j)){
+						alphaBitmapdata.setPixel32(i,j,0x00000000);
+					}else{
+						alphaBitmapdata.setPixel32(i,j,0xff000000);
+					}
+				}
+			}
 		}
 		
 		public function setMapInfo(baseUrl:String,fileName:String):void{
@@ -134,7 +144,9 @@ package view.map
 			this.addEventListener(MouseEvent.MIDDLE_MOUSE_UP,onStopDrag);
 			
 			shape = new Shape;
-			this.addChild(shape);
+			//this.addChild(shape);
+			shapebitmap = new Bitmap;
+			this.addChild(shapebitmap);
 			
 			lineShpae = new Shape;
 			this.addChild(lineShpae);
@@ -189,10 +201,10 @@ package view.map
 		private function initData():void{
 			resultData = new Array;
 			var w:int = mapWidth/64 + 1;
-			var h:int = mapHeight/32 + 1;
-			for(var i:int=0;i<w;i++){
+			var h:int = mapHeight/16 + 1;
+			for(var i:int=0;i<h;i++){
 				resultData[i] = new Array;
-				for(var j:int=0;j<h;j++){
+				for(var j:int=0;j<w;j++){
 					resultData[i][j] = 0;
 				}
 			}
@@ -207,7 +219,10 @@ package view.map
 			for(i=-l;i<l;i++){
 				drawRightLine(64*i-32);
 			}
-			
+			var bitmapdata:BitmapData = new BitmapData(mapWidth,mapHeight,true,0);
+			bitmapdata.draw(shape);
+			shapebitmap.bitmapData = bitmapdata;
+			shape.graphics.clear();
 		}
 		private function drawLeftLine(x:int):void{
 			var bx:int = x;
@@ -248,7 +263,10 @@ package view.map
 		}
 		
 		private function onClick(event:MouseEvent):void{
-			
+			if(blockBitmapdata){
+				var a:uint = blockBitmapdata.getPixel32(this.mouseX,this.mouseY);
+				trace(a.toString(16))
+			}
 		}
 		private function onMouseDown(event:MouseEvent):void{
 			this.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
@@ -263,24 +281,38 @@ package view.map
 			circleMouse.x = this.mouseX;
 			circleMouse.y = this.mouseY;
 		}
+		public function setRadius(num:int):void{
+			courseRadius = num;
+		}
 		private function setCourse():void{
 			circleMouse = new Shape;
 			this.addChild(circleMouse);
-			courseRadius = 70;
-			//circleMouse.graphics.lineStyle(0x0000ff,1);
-			circleMouse.graphics.beginFill(0x0000ff,0.5);
+			//courseRadius = courseRadius;
+			if(model.tailStep == 1){
+				circleMouse.graphics.lineStyle(2,0x00ff00);
+				circleMouse.graphics.beginFill(0x00ff00,0.5);
+			}else if(model.tailStep == 2){
+				circleMouse.graphics.lineStyle(2,0x0000ff);
+				circleMouse.graphics.beginFill(0x0000ff,0.5);
+			}else if(model.tailStep == 3){
+				circleMouse.graphics.lineStyle(2,0xffffff);
+				circleMouse.graphics.beginFill(0xffffff,0.5);
+			}
 			circleMouse.graphics.drawCircle(0,0,courseRadius);
 			circleMouse.graphics.endFill();
 		}
 		private function removeCourse():void{
-			this.removeChild(circleMouse);
+			if(circleMouse && circleMouse.parent)
+				this.removeChild(circleMouse);
 		}
 		private function drawCircleTail(px:int,py:int):void{
 			var p:Point = Util.getTilePoint(px,py);
 			var pxp:Point = Util.getPixelPoint(p.x,p.y);
 			
-			for(var i:int=p.x-3;i<p.x+3;i++){
-				for(var j:int=p.y-3;j<p.y+3;j++){
+			var tempNum:int = this.courseRadius/20;
+			
+			for(var i:int=p.x-tempNum;i<p.x+tempNum;i++){
+				for(var j:int=p.y-tempNum;j<p.y+tempNum;j++){
 					var dp:Point = Util.getPixelPoint(i,j);
 					var dis:Number = Point.distance(dp,pxp);
 					if(dis < courseRadius){
@@ -290,7 +322,7 @@ package view.map
 			}
 		}
 		private function drawTail(tx:int,ty:int):void{
-			if(tx < 0 || ty < 0 ){
+			if(tx < 0 || ty < 0 || tx > resultData[0].length-1 || ty > resultData.length-1){
 				return;
 			}
 			if(model.tailStep == -1){
@@ -303,12 +335,16 @@ package view.map
 			if(model.tailStep == 1){
 				if(resultData[tx][ty] == 1){
 					return;
+				}else if(resultData[tx][ty] == 2){
+					removeTail(p);
 				}
 				resultData[tx][ty] = 1;
 				addGreenTail(p);
 			}else if(model.tailStep == 2){
 				if(resultData[tx][ty] == 2){
 					return;
+				}else if(resultData[tx][ty] == 1){
+					removeTail(p);
 				}
 				resultData[tx][ty] = 2;
 				addBlueTail(p);
@@ -332,7 +368,11 @@ package view.map
 		private function removeTail(p:Point):void{
 			var rec:Rectangle = new Rectangle(0,0,64,32);
 			blockBitmapdata.copyChannel(alphaBitmapdata,rec,p,BitmapDataChannel.ALPHA,BitmapDataChannel.ALPHA);
-			blockBitmapdata.threshold(blockBitmapdata,rec,new Point,"<=",0xff000000,0);
+			rec.x = p.x;
+			rec.y = p.y;
+			blockBitmapdata.threshold(blockBitmapdata,rec,p,"==",0xff000000,0);
+			blockBitmapdata.threshold(blockBitmapdata,rec,p,"==",0xff00ff00,0x7f00ff00);
+			blockBitmapdata.threshold(blockBitmapdata,rec,p,"==",0xff0000ff,0x7f0000ff);
 		}
 		
 		private function save():void{
