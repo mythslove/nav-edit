@@ -4,7 +4,9 @@ package view.map
 	
 	import com.background.BackgroundLayer;
 	
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.BitmapDataChannel;
 	import flash.display.Shape;
 	import flash.display.SpreadMethod;
 	import flash.display.Sprite;
@@ -15,6 +17,7 @@ package view.map
 	import flash.filesystem.FileStream;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.text.TextField;
@@ -53,7 +56,8 @@ package view.map
 		private var shape:Shape;
 		private var lineShpae:Shape;
 		private var lineS:Shape;
-		private var blockS:Shape;
+		private var blockBitmap:Bitmap;
+		private var blockBitmapdata:BitmapData;
 		private var pathShape:Sprite;
 		private var container:Sprite;
 		private var blockContainer:Sprite;
@@ -62,6 +66,11 @@ package view.map
 		private var blockDic:Object;
 		private var circleMouse:Shape;
 		private var courseRadius:int;
+		
+		private var greenBitmapdata:BitmapData;
+		private var buleBitmapdata:BitmapData;
+		private var alphaBitmapdata:BitmapData;
+		private var alphaReversBitmapdata:BitmapData
 		
 		public var resultData:Array;
 		
@@ -75,7 +84,33 @@ package view.map
 			this.addEventListener(MouseEvent.CLICK,onClick);
 			this.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
 			this.addEventListener(MouseEvent.MOUSE_UP,onMouseUp);
-			//this.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
+			
+			greenBitmapdata = new BitmapData(64,32,true,0x7f00ff00);
+			buleBitmapdata = new BitmapData(64,32,true,0x7f0000ff);
+			alphaBitmapdata = new BitmapData(64,32,true,0);
+			alphaReversBitmapdata = new BitmapData(64,32,true,0);
+			
+			var shape:Shape = new Shape;
+			shape.graphics.beginFill(0xff0000);
+			shape.graphics.moveTo(32,0);
+			shape.graphics.lineTo(64,16);
+			shape.graphics.lineTo(32,32);
+			shape.graphics.lineTo(0,16);
+			shape.graphics.lineTo(32,0);
+			shape.graphics.endFill();
+			alphaReversBitmapdata.draw(shape);
+			
+			shape.graphics.clear();
+			
+			shape.graphics.beginFill(0xff0000);
+			shape.graphics.drawRect(0,0,64,32);
+			shape.graphics.moveTo(32,0);
+			shape.graphics.lineTo(64,16);
+			shape.graphics.lineTo(32,32);
+			shape.graphics.lineTo(0,16);
+			shape.graphics.lineTo(32,0);
+			shape.graphics.endFill();
+			alphaBitmapdata.draw(shape);
 		}
 		
 		public function setMapInfo(baseUrl:String,fileName:String):void{
@@ -108,9 +143,9 @@ package view.map
 			this.addChild(lineS);
 			lineS.graphics.lineStyle(3,0xffff00,1);
 			
-			blockS = new Shape;
-			this.addChild(blockS);
-			blockS.graphics.beginFill(0x00ff00,0.5)
+			blockBitmapdata = new BitmapData(mapWidth,mapHeight,true,0);
+			blockBitmap = new Bitmap(blockBitmapdata);
+			this.addChild(blockBitmap);
 			
 			pathShape = new Sprite;
 			this.addChild(pathShape);
@@ -255,18 +290,49 @@ package view.map
 			}
 		}
 		private function drawTail(tx:int,ty:int):void{
-			if(resultData[tx][ty] == 1){
+			if(tx < 0 || ty < 0 ){
 				return;
 			}
-			resultData[tx][ty] = 1;
-			
+			if(model.tailStep == -1){
+				return;
+			}
 			var p:Point = Util.getPixelPoint(tx,ty);
+			p.x -= 32;
+			p.y -= 16;
 			
-			blockS.graphics.moveTo(p.x,p.y-16);
-			blockS.graphics.lineTo(p.x+32,p.y);
-			blockS.graphics.lineTo(p.x,p.y+16)
-			blockS.graphics.lineTo(p.x-32,p.y);
+			if(model.tailStep == 1){
+				if(resultData[tx][ty] == 1){
+					return;
+				}
+				resultData[tx][ty] = 1;
+				addGreenTail(p);
+			}else if(model.tailStep == 2){
+				if(resultData[tx][ty] == 2){
+					return;
+				}
+				resultData[tx][ty] = 2;
+				addBlueTail(p);
+			}else if(model.tailStep == 3){
+				if(resultData[tx][ty] == 0){
+					return;
+				}
+				resultData[tx][ty] = 0;
+				removeTail(p);
+			}
 			
+		}
+		private function addGreenTail(p:Point):void{
+			var rec:Rectangle = new Rectangle(0,0,64,32);
+			blockBitmapdata.copyPixels(greenBitmapdata,rec,p,alphaReversBitmapdata,new Point,true);
+		}
+		private function addBlueTail(p:Point):void{
+			var rec:Rectangle = new Rectangle(0,0,64,32);
+			blockBitmapdata.copyPixels(buleBitmapdata,rec,p,alphaReversBitmapdata,new Point,true);
+		}
+		private function removeTail(p:Point):void{
+			var rec:Rectangle = new Rectangle(0,0,64,32);
+			blockBitmapdata.copyChannel(alphaBitmapdata,rec,p,BitmapDataChannel.ALPHA,BitmapDataChannel.ALPHA);
+			blockBitmapdata.threshold(blockBitmapdata,rec,new Point,"<=",0xff000000,0);
 		}
 		
 		private function save():void{
