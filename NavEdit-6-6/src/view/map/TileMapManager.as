@@ -181,7 +181,7 @@ package view.map
 		}
 		
 		private function loadmapdata():void{
-			var file:File = new File(basicurl + "/" + murl + ".mapedit");
+			var file:File = new File(basicurl + "/" + murl + ".tailEdit");
 			if(file.exists){
 				var urlloader:URLLoader = new URLLoader;
 				urlloader.addEventListener(Event.COMPLETE,dataOnComplete);
@@ -196,15 +196,38 @@ package view.map
 			this.picH = int(xml.@pich);
 			createBg(picW,picH);
 			drawBg();
-			initData();
+			//initData();
+			initDataByLoad(xml.@mapdata);
+		}
+		private function initDataByLoad(dataStr:String):void{
+			resultData = new Array;
+			var w:int = mapWidth/64 + 1;
+			var h:int = mapHeight/16 + 1;
+			var flag:int;
+			for(var i:int;i<dataStr.length;i+=h){
+				var str:String = dataStr.substr(i,h);
+				resultData[flag] = new Array;
+				for(var j:int=0;j<str.length;j++){
+					resultData[flag].push(int(str.substr(j,1)));
+					var p:Point = Util.getPixelPoint(flag,j);
+					p.x -= 32;
+					p.y -= 16;
+					if(resultData[flag][j] == 1){
+						addGreenTail(p);
+					}else if(resultData[flag][j] == 2){
+						addBlueTail(p);
+					}
+				}
+				flag++;
+			}
 		}
 		private function initData():void{
 			resultData = new Array;
 			var w:int = mapWidth/64 + 1;
 			var h:int = mapHeight/16 + 1;
-			for(var i:int=0;i<h;i++){
+			for(var i:int=0;i<w;i++){
 				resultData[i] = new Array;
-				for(var j:int=0;j<w;j++){
+				for(var j:int=0;j<h;j++){
 					resultData[i][j] = 0;
 				}
 			}
@@ -322,7 +345,7 @@ package view.map
 			}
 		}
 		private function drawTail(tx:int,ty:int):void{
-			if(tx < 0 || ty < 0 || tx > resultData[0].length-1 || ty > resultData.length-1){
+			if(tx < 0 || ty < 0 || tx > resultData.length-1 || ty > resultData[0].length-1){
 				return;
 			}
 			if(model.tailStep == -1){
@@ -375,7 +398,7 @@ package view.map
 			blockBitmapdata.threshold(blockBitmapdata,rec,p,"==",0xff0000ff,0x7f0000ff);
 		}
 		
-		private function save():void{
+		public function save():void{
 			var file:File;
 			var fs:FileStream = new FileStream();
 			var str:String;
@@ -396,10 +419,15 @@ package view.map
 			model.mapHeight = mapHeight;
 			model.picw = picW;
 			model.picH = picH;
-			str = "<map name='" + model.mapname + "' mapwidth='" + 
+			str = "<map type='tail' name='" + model.mapname + "' mapwidth='" + 
 				model.mapWidth + "' mapheight='" + model.mapHeight + "' picw='" + 
 				model.picw + "' pich='" + model.picH + "' mapdata='" + str + "'/>"
 			
+			fs.writeUTFBytes(str);
+			fs.close();
+			
+			file = new File(basicurl + "/" + murl + ".tailMap");// File.documentsDirectory.resolvePath("navMap/" + murl + ".mapedit");
+			fs.open(file,FileMode.WRITE);
 			fs.writeUTFBytes(str);
 			fs.close();
 		}
