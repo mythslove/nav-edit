@@ -656,6 +656,10 @@ package org.blch.geom
 			}
 			return rs;
 		}
+		public function writeCircleFile():String{
+			var rs:String =  int(circle.center.x) + "," + int(circle.center.y) + "," + int(circle.radius);
+			return rs;
+		}
 		private var allLine:Array;
 		public function getRatelition(testline:Line2D):Boolean{
 			if(allLine == null){

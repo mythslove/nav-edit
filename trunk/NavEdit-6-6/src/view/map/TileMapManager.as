@@ -426,7 +426,7 @@ package view.map
 			fs.writeUTFBytes(str);
 			fs.close();
 			
-			file = new File(basicurl + "/" + murl + ".tailMap");// File.documentsDirectory.resolvePath("navMap/" + murl + ".mapedit");
+			file = new File(basicurl + "/" + murl + ".navtail");// File.documentsDirectory.resolvePath("navMap/" + murl + ".mapedit");
 			fs.open(file,FileMode.WRITE);
 			fs.writeUTFBytes(str);
 			fs.close();
