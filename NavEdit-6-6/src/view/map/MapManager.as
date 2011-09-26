@@ -29,12 +29,14 @@ package view.map
 	import org.blch.findPath.Cell;
 	import org.blch.findPath.LineCrossBlock;
 	import org.blch.findPath.NavMesh;
+	import org.blch.geom.Circle;
 	import org.blch.geom.Delaunay;
 	import org.blch.geom.Line2D;
 	import org.blch.geom.PointClassification;
 	import org.blch.geom.Polygon;
 	import org.blch.geom.Triangle;
 	import org.blch.geom.Vector2f;
+	import org.blch.util.GeomUtils;
 	
 	import spark.components.mediaClasses.VolumeBar;
 	
@@ -387,27 +389,47 @@ package view.map
 			fs.writeUTFBytes(str);
 			fs.close();
 			
-			file = new File(basicurl + "/" + murl + ".navmap")// File.documentsDirectory.resolvePath("navMap/" + murl + ".navmap");
+			file = new File(basicurl + "/" + murl + ".navtail")// File.documentsDirectory.resolvePath("navMap/" + murl + ".navmap");
 			fs.open(file,FileMode.WRITE);
 			var mapdataStr:String = '';
 			for(var i:int=0;i<triangleV.length;i++){
 				trg = triangleV[i];
 				mapdataStr += trg.writeFile();
+				var blockministr:String = '~';
 				for(j=0;j<blockPolygonV.length;j++){
 					pol = blockPolygonV[j];
 					if(isInsert(trg,pol)){
-						mapdataStr += "," + j;
+						blockministr += j + ",";
 					}
 				}
+				blockministr = blockministr.substr(0,blockministr.length-1);
+				mapdataStr += blockministr;
+				
+				blockministr = "~";
+				for(j=0;j<crossBlockPolygonV.length;j++){
+					pol = crossBlockPolygonV[j];
+					var circle:Circle = pol.circle
+					if(isInsertCircle(trg,pol.circle)){
+						blockministr += j + ",";
+					}
+				}
+				blockministr = blockministr.substr(0,blockministr.length-1);
+				mapdataStr += blockministr;
+				
 				mapdataStr += "|";
 				//mapdataStr += trg.getVertex(0).writeFile() +  trg.getVertex(1).writeFile() +  trg.getVertex(2).writeFile();
 			}
 			mapdataStr = mapdataStr.substr(0,mapdataStr.length-1);
 			
+			crossBlockStr = crossBlockPolygonV[0].writeCircleFile()
+			for(i=1;i<crossBlockPolygonV.length;i++){
+				pol = crossBlockPolygonV[i];
+				crossBlockStr += "//" + pol.writeCircleFile();
+			}
 			
-			str = "<map name='" + model.mapname + "' mapwidth='" + 
+			str = "<map type='nav' name='" + model.mapname + "' mapwidth='" + 
 				model.mapWidth + "' mapheight='" + model.mapHeight + "' picw='" + 
-				model.picw + "' pich='" + model.picH + "' mapdata='" + mapdataStr + "' blockdata='" + blockStr +"'/>"
+				model.picw + "' pich='" + model.picH + "' mapdata='" + mapdataStr + "' blockdata='" + blockStr +"' crossBlockdata='" + crossBlockStr + "'/>"
 			fs.writeUTFBytes(str);
 			fs.close();
 			
@@ -455,6 +477,22 @@ package view.map
 				var insertAry:Array = getInsert(l,PolV);
 				if(insertAry.length > 0){
 					return true;
+				}
+			}
+			return false;
+		}
+		private function isInsertCircle(trg:Triangle,circle:Circle):Boolean{
+			for(var i:int=0;i<3;i++){
+				var line:Line2D = trg.getSide(i);
+				if(circle.isCross(line)){
+					var p1:Vector2f = new Vector2f;
+					var p2:Vector2f = new Vector2f;
+					GeomUtils.getCricleIntersection(line,circle,p1,p2);
+					if((p1.x > line.pointA.x && p1.x > line.pointB.x) || (p1.x < line.pointA.x && p1.x < line.pointB.x) ){
+						continue;
+					}else{
+						return true;
+					}
 				}
 			}
 			return false;
@@ -639,7 +677,7 @@ package view.map
 			}
 		}
 		private function addCrossBlockByData(str:String):void{
-			if(str == null){
+			if(str == null || str  == ""){
 				return;
 			}
 			var ary:Array = str.split("//");
