@@ -405,7 +405,7 @@ package view.map
 				blockministr = blockministr.substr(0,blockministr.length-1);
 				mapdataStr += blockministr;
 				
-				blockministr = "~";
+				blockministr = "!";
 				for(j=0;j<crossBlockPolygonV.length;j++){
 					pol = crossBlockPolygonV[j];
 					var circle:Circle = pol.circle
