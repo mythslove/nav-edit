@@ -395,17 +395,19 @@ package view.map
 			for(var i:int=0;i<triangleV.length;i++){
 				trg = triangleV[i];
 				mapdataStr += trg.writeFile();
-				var blockministr:String = '~';
+				var blockministr:String = '/~';
 				for(j=0;j<blockPolygonV.length;j++){
 					pol = blockPolygonV[j];
 					if(isInsert(trg,pol)){
 						blockministr += j + ",";
 					}
 				}
-				blockministr = blockministr.substr(0,blockministr.length-1);
-				mapdataStr += blockministr;
+				if(blockministr.length != 2){
+					blockministr = blockministr.substr(0,blockministr.length-1);
+					mapdataStr += blockministr;
+				}
 				
-				blockministr = "!";
+				blockministr = "/!";
 				for(j=0;j<crossBlockPolygonV.length;j++){
 					pol = crossBlockPolygonV[j];
 					var circle:Circle = pol.circle
@@ -413,9 +415,10 @@ package view.map
 						blockministr += j + ",";
 					}
 				}
-				blockministr = blockministr.substr(0,blockministr.length-1);
-				mapdataStr += blockministr;
-				
+				if(blockministr.length != 2){
+					blockministr = blockministr.substr(0,blockministr.length-1);
+					mapdataStr += blockministr;
+				}
 				mapdataStr += "|";
 				//mapdataStr += trg.getVertex(0).writeFile() +  trg.getVertex(1).writeFile() +  trg.getVertex(2).writeFile();
 			}
