@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="init()" fontSize="12" width="1200" height="700" xmlns:map="view.map.*" xmlns:view="view.*">
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" 
+						creationComplete="init()" fontSize="12" width="1200" height="700" 
+						xmlns:map="view.map.*" xmlns:view="view.*">
 <mx:Script>
 	<![CDATA[
 		import com.background.BackgroundLayer;
