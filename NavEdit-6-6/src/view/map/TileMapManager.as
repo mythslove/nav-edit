@@ -426,11 +426,58 @@ package view.map
 			fs.writeUTFBytes(str);
 			fs.close();
 			
-			file = new File(basicurl + "/" + murl + ".navtail");// File.documentsDirectory.resolvePath("navMap/" + murl + ".mapedit");
+			//converXY(resultData);
+			
+			str = "<map type='tile' name='" + model.mapname + "' mapwidth='" + 
+				model.mapWidth + "' mapheight='" + model.mapHeight + "' picw='" + 
+				model.picw + "' pich='" + model.picH + "' mapdata='" + converXY(resultData) + "'/>"
+			
+			file = new File(basicurl + "/" + murl + ".navtile");// File.documentsDirectory.resolvePath("navMap/" + murl + ".mapedit");
 			fs.open(file,FileMode.WRITE);
 			fs.writeUTFBytes(str);
 			fs.close();
+			
+			/*file = new File(basicurl + "/" + murl + "-90.jpg")
+			var bitmapdata:BitmapData = new BitmapData(mapWidth,mapHeight,true,0);
+			bitmapdata.draw(bg);
+			var bytes:ByteArray = new JPEGEncoder(10).encode(bitmapdata);
+			bytes.position = 0;
+			fs.open(file,FileMode.WRITE);
+			fs.writeBytes(bytes,0,bytes.length);
+			fs.close();*/
 		}
+		
+		private function converXY(ary:Array):String{
+			/*var l0:int = ary[0].length;
+			var l:int = ary.length;
+			var newary:Array = new Array;
+			for(var i:int;i<l0;i++){
+				newary[i] = new Array;
+				for(var j:int=0;j<l;j++){
+					//str+=resultData[i][j];
+					newary[i][j] = ary[j][i];
+				}
+			}
+			
+			var la:int = newary[0].length;
+			
+			var str:String;
+			for(i = 0;i<newary.length;i++){
+				for(j=0;j<la;j++){
+					str+=newary[i][j];
+				}
+			}
+			return str;*/
+			var str:String = "";
+			for(var i:int=0;i<ary[0].length;i++)
+			{
+				for(var j:int=0;j<ary.length;j++)
+					str += ary[j][i].toString();
+			}
+			return str;
+			
+		}
+		
 		
 		
 	}

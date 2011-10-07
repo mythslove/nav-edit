@@ -23,6 +23,8 @@ package view.map
 	
 	import models.ModelLocator;
 	
+	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import mx.core.UIComponent;
 	import mx.graphics.codec.JPEGEncoder;
 	
@@ -37,8 +39,6 @@ package view.map
 	import org.blch.geom.Triangle;
 	import org.blch.geom.Vector2f;
 	import org.blch.util.GeomUtils;
-	
-	import spark.components.mediaClasses.VolumeBar;
 	
 	import view.TenCourse;
 	
@@ -89,6 +89,7 @@ package view.map
 		private function onstageMove(event:MouseEvent):void{
 			course.x = this.mouseX;
 			course.y = this.mouseY;
+			FlexGlobals.topLevelApplication.status = "当前坐标：(" + this.mouseX + "," + this.mouseY + ")";
 		}
 		private function onClick(event:MouseEvent):void{
 			if(model.step == 1){
